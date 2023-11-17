@@ -3,6 +3,7 @@
 
 # private folder
 /.private
+/private
 
 # build folders
 /build*
