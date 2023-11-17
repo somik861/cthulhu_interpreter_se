@@ -1,0 +1,9 @@
+# vscode
+.vs
+
+# private folder
+/.private
+
+# build folders
+/build*
+/out
