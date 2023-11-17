@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 	fs::path log_path(argv[2]);
 
 	if (!fs::exists(source_path)) {
-		std::cerr << "Source path does not exists\n";
+		std::cerr << "Source path does not exist\n";
 		return 1;
 	}
 }
