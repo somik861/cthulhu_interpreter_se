@@ -7,17 +7,20 @@
 namespace cthu::program::impl {
 class StackVector : public IStack {
   public:
-    void push(std::shared_ptr<IStackItem> item) override;
-    std::shared_ptr<IStackItem> top() override;
+    void push(std::unique_ptr<IStackItem> item) override;
+    IStackItem* top() override;
     void pop() override;
-    std::shared_ptr<IStackItem> poptop() override;
+    std::unique_ptr<IStackItem> poptop() override;
     std::size_t size() const override;
     bool empty() const override;
     void clear() override;
-    std::shared_ptr<IStack> clone() const override;
-    std::shared_ptr<IStack> getEmpty() const override;
+    std::unique_ptr<IStack> clone() const override;
+    std::unique_ptr<IStackItem> cloneItem() const override;
+    std::unique_ptr<IStack> getEmpty() const override;
 
   private:
-    std::vector<std::shared_ptr<IStackItem>> m_vector;
+    std::unique_ptr<StackVector> cloneRaw() const;
+
+    std::vector<std::unique_ptr<IStackItem>> m_vector;
 };
 } // namespace cthu::program::impl

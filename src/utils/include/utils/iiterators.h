@@ -27,7 +27,7 @@ class IIterator {
      */
     virtual value_type& value() = 0;
 
-    virtual ~IIterator() = 0;
+    virtual ~IIterator() = default;
 };
 
 template <typename T>

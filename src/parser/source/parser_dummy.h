@@ -5,6 +5,6 @@
 namespace cthu::parser::impl {
 class ParserDummy : public virtual IParser {
   public:
-    std::unique_ptr<program::IProgram> parse(std::istream& source_code) override { return nullptr; }
+    void parse(std::istream& source_code, program::IProgram* program) override { return; }
 };
 } // namespace cthu::parser::impl

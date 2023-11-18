@@ -80,3 +80,6 @@ class ISet {
     static std::unique_ptr<ISet> createStdSet();
 };
 } // namespace utils
+
+// import templated definitions
+#include "../source/std_set.h"

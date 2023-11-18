@@ -78,14 +78,14 @@ class IMap {
      *
      * @return      iterator
      */
-    virtual std::unique_ptr<IBidirectionalIterator<std::pair<const key_type&, value_type&>>> iterator() = 0;
+    virtual std::unique_ptr<IBidirectionalIterator<std::pair<const key_type, value_type>>> iterator() = 0;
 
     /**
      * @brief Get an iterator
      *
      * @return      iterator
      */
-    virtual std::unique_ptr<IBidirectionalIterator<std::pair<const key_type&, const value_type&>>> iterator() const = 0;
+    virtual std::unique_ptr<IBidirectionalIterator<const std::pair<const key_type, value_type>>> iterator() const = 0;
 
     /**
      * @brief Get a copy of the map
@@ -107,3 +107,6 @@ class IMap {
     static std::unique_ptr<IMap> createStdMap();
 };
 } // namespace utils
+
+// import templated definitions
+#include "../source/std_map.h"

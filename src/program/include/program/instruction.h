@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace cthu::program::stack_items {
+namespace cthu::program {
 class Instruction : public virtual IStackItem {
   public:
     Instruction(std::string builtin, std::string operation, std::vector<std::string> operands, std::size_t source_line)
@@ -23,4 +23,4 @@ class Instruction : public virtual IStackItem {
     std::vector<std::string> m_operands;
     std::size_t m_source_line;
 };
-} // namespace cthu::program::stack_items
+} // namespace cthu::program

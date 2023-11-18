@@ -16,6 +16,8 @@ class IProgram {
     virtual void setInitDictionary(std::unique_ptr<IDict> dict) = 0;
 
     virtual ~IProgram() = default;
+
+    static std::unique_ptr<IProgram> createProgram();
 };
 
 } // namespace cthu::program

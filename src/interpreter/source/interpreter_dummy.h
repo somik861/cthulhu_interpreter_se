@@ -5,7 +5,7 @@
 namespace cthu::interpreter::impl {
 class InterpreterDummy : public virtual IInterpreter {
   public:
-    void addBuiltin(std::string_view name, std::unique_ptr<builtins::IBuiltin> builtin) override {}
+    void addBuiltin(const std::string& name, std::unique_ptr<builtins::IBuiltin> builtin) override {}
     void initExecution(std::unique_ptr<program::IProgram> program, std::ostream* log_stream = nullptr) override {}
     bool canContinue() const override { return false; }
     void continueExecution() override {}

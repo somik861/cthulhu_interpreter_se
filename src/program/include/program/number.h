@@ -2,7 +2,7 @@
 
 #include "program/istack_item.h"
 
-namespace cthu::program::stack_items {
+namespace cthu::program {
 class Number : public virtual IStackItem {
   public:
     Number(uint32_t value) : m_value(value) {}
@@ -11,4 +11,4 @@ class Number : public virtual IStackItem {
   private:
     uint32_t m_value;
 };
-} // namespace cthu::program::stack_items
+} // namespace cthu::program

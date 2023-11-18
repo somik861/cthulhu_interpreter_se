@@ -27,18 +27,17 @@ int main(int argc, char** argv) {
     std::ifstream source_code(source_path);
     std::ofstream log_stream(log_path);
 
-    auto parser = cthu::parser::IParser::createParserDummy();
+    auto parser = cthu::parser::IParser::createParser();
     auto interpreter = cthu::interpreter::IInterpreter::createInterpreterDummy();
+    auto program = cthu::program::IProgram::createProgram();
+    parser->parse(source_code, program.get());
 
-    interpreter->initExecution(parser->parse(source_code), &log_stream);
+    interpreter->initExecution(std::move(program), &log_stream);
     while (interpreter->canContinue())
         interpreter->continueExecution();
 
     auto final_state = interpreter->getProgramState();
     if (final_state != nullptr) {
-        auto stacks = final_state->getKnownStacks();
-        auto iter = stacks->iterator();
-        while (iter->hasNext())
-            std::cout << iter->next() << '\n';
+        auto dict = final_state->getStateDict();
     }
 }

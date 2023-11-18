@@ -1,6 +1,6 @@
 #pragma once
 
-#include "program/istack.h"
+#include "program/idict.h"
 #include "utils/iset.h"
 
 #include <memory>
@@ -13,40 +13,39 @@ class IProgramState {
     /**
      * @brief Get line number corresponding to the last processed line
      *
-     * @returns line number
+     * @return      line number
      */
-    virtual int getLastLineNumber() = 0;
+    virtual int getLastLineNumber() const = 0;
+    /**
+     * @brief set the last line number
+     *
+     * @param[in]    line number
+     */
+    virtual void setLastLineNumber(int number) = 0;
 
     /**
      * @brief Get number of line that will be executed next.
      *
-     * @returns line number
+     * @return      line number
      */
-    virtual int getNextLineNumber() = 0;
-
-    virtual std::unique_ptr<utils::ISet<std::string>> getKnownStacks() const = 0;
+    virtual int getNextLineNumber() const = 0;
+    /**
+     * @brief set the next line number
+     *
+     * NOTE: setting this is mostly job of the interpreter for your convenience.
+     * If you want to change the line to be executed, please make sure that the interpreter
+     * also reads and takes it into consideration, otherwise it will have no effect.
+     *
+     * @param[in]    line number
+     */
+    virtual void setNextLineNumber(int number) = 0;
 
     /**
-     * @brief Get stack with corresponding name
+     * @brief Get pointer to the state dict
      *
-     * NOTE: This is not a copy of the stack, all changes will also affect the
-     *program. To obtain a deep-copy call const-version of this method.
-     *
-     * @brief stack corresponding to given name, or nullptr no such stack
-     *exists.
+     * @return      state dictionary
      */
-    virtual std::shared_ptr<program::IStack> getStack(std::string_view name) = 0;
-
-    /**
-     * @brief Get stack with corresponding name
-     *
-     * NOTE: This is not a copy of the stack, all changes will also affect the
-     *program. To obtain a deep-copy call const-version of this method.
-     *
-     * @brief stack corresponding to given name, or nullptr no such stack
-     *exists.
-     */
-    virtual std::shared_ptr<program::IStack> getStack(std::string_view name) const = 0;
+    virtual program::IDict* getStateDict() = 0;
 
     /**
      * @brief Check whether current program state corresponds to finished execution
@@ -67,6 +66,22 @@ class IProgramState {
      * @return            false if program can continue from this state or ended with error, else true
      */
     virtual bool isFinishedSuccessfully() const = 0;
+
+    /**
+     * @brief Set current program state as finished;
+     *
+     * @param[in] is_errornous      whether the program ended because of the end, or because of termination (e.g. guard)
+     */
+    virtual void setFinished(bool is_errornous = false) = 0;
+
+    /**
+     * @brief Set error message
+     *
+     * NOTE: this autmatically sets the program to finished error state (calls setFinished(true))
+     *
+     * @param[in] message            error message
+     */
+    virtual void setError(const std::string& message) = 0;
 
     virtual ~IProgramState() = default;
 };
