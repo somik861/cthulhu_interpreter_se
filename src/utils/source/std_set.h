@@ -1,13 +1,14 @@
 #pragma once
 
-#include "iset.h"
+#include "utils/iset.h"
 
 #include "std_iterator_wrapper.h"
 
 #include <set>
 
 namespace utils::impl {
-typename<typename T> class StdSet : public virtual ISet<T> {
+template <typename T>
+class StdSet : public virtual ISet<T> {
   public:
     using value_type = T;
 
@@ -25,7 +26,7 @@ typename<typename T> class StdSet : public virtual ISet<T> {
     }
     std::unique_ptr<ISet> clone() const override {
         auto cpy = std::make_unique<StdSet>();
-        cpy.m_set = m_set;
+        cpy->m_set = m_set;
         return cpy;
     }
     std::unique_ptr<ISet> getEmpty() const override { return std::make_unique<StdSet>(); }
@@ -35,3 +36,10 @@ typename<typename T> class StdSet : public virtual ISet<T> {
 };
 
 } // namespace utils::impl
+
+namespace utils {
+template <typename T>
+/* static */ std::make_unique<ISet<T>> ISet<T>::createStdSet() {
+    return std::make_unique<StdSet>();
+}
+} // namespace utils

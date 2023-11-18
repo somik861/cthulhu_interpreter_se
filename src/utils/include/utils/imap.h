@@ -1,8 +1,6 @@
 #pragma once
 
-#include "iiterators.h"
-
-#include "../source/std_map.h"
+#include "utils/iiterators.h"
 
 namespace utils {
 template <typename key_t, typename value_t>
@@ -103,10 +101,9 @@ class IMap {
      * @return       empty map
      */
     virtual std::unique_ptr<IMap> getEmpty() const = 0;
+    virtual ~IMap() = default;
 
     /* Map factories below */
     static std::unique_ptr<IMap> createStdMap();
-
-    virtual ~IMap() = default;
 };
 } // namespace utils

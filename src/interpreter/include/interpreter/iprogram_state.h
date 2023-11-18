@@ -1,9 +1,9 @@
 #pragma once
 
-#include "istack.h"
+#include "program/istack.h"
+#include "utils/iset.h"
 
 #include <memory>
-#include <set>
 #include <string>
 #include <string_view>
 
@@ -24,7 +24,7 @@ class IProgramState {
      */
     virtual int getNextLineNumber() = 0;
 
-    virtual std::set<std::string> getKnownStacks() const = 0;
+    virtual std::unique_ptr<utils::ISet<std::string>> getKnownStacks() const = 0;
 
     /**
      * @brief Get stack with corresponding name
@@ -35,7 +35,7 @@ class IProgramState {
      * @brief stack corresponding to given name, or nullptr no such stack
      *exists.
      */
-    virtual std::shared_ptr<IStack> getStack(std::string_view name) = 0;
+    virtual std::shared_ptr<program::IStack> getStack(std::string_view name) = 0;
 
     /**
      * @brief Get stack with corresponding name
@@ -46,7 +46,27 @@ class IProgramState {
      * @brief stack corresponding to given name, or nullptr no such stack
      *exists.
      */
-    virtual std::shared_ptr<IStack> getStack(std::string_view name) const = 0;
+    virtual std::shared_ptr<program::IStack> getStack(std::string_view name) const = 0;
+
+    /**
+     * @brief Check whether current program state corresponds to finished execution
+     *
+     * This does not mean that the program finished properly in this state.
+     * If you want to see, whether program ended as it should (i.e. not in guard, etc.),
+     * call isFinishedSuccessfully().
+     *
+     * @return           false if program can continue from this state, else true
+     */
+    virtual bool isFinished() const = 0;
+
+    /**
+     * @brief Check whether current program state corresponds to properly finished execution
+     *
+     * Most of the times, if this method returns true, the state holds result that you want.
+     *
+     * @return            false if program can continue from this state or ended with error, else true
+     */
+    virtual bool isFinishedSuccessfully() const = 0;
 
     virtual ~IProgramState() = default;
 };

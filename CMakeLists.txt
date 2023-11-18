@@ -13,5 +13,6 @@ add_project_module("${CMAKE_SOURCE_DIR}/src/builtins")
 add_project_module("${CMAKE_SOURCE_DIR}/src/interpreter")
 add_project_module("${CMAKE_SOURCE_DIR}/src/parser")
 add_project_module("${CMAKE_SOURCE_DIR}/src/utils")
+add_project_module("${CMAKE_SOURCE_DIR}/src/program")
 
 add_executable(cthulhu src/main.cpp ${SOURCE_FILES})

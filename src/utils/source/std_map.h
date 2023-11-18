@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imap.h"
+#include "utils/imap.h"
 
 #include "std_iterator_wrap.h"
 
@@ -37,7 +37,7 @@ class StdMap : public virtual IMap<key_t, value_t> {
     }
     std::unique_ptr<IMap> clone() const override {
         auto cpy = std::make_unique<StdMap>();
-        cpy.m_map = m_map;
+        cpy->m_map = m_map;
         return cpy;
     }
     std::unique_ptr<IMap> getEmpty() const override { return std::make_unique<StdMap>(); }
@@ -48,5 +48,8 @@ class StdMap : public virtual IMap<key_t, value_t> {
 } // namespace utils::impl
 
 namespace utils {
-/* static */ std::unique_ptr<IMap> IMap::createStdMap() { return std::make_unique<impl::StdMap>(); }
+template <typename key_t, typename value_t>
+/* static */ std::make_unique<IMap<key_t, value_t>> IMap<key_t, value_t>::createStdMap() {
+    return std::make_unique<StdMap>();
+}
 } // namespace utils

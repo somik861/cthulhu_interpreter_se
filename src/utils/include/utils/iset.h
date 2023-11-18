@@ -1,6 +1,6 @@
 #pragma once
 
-#include "iiterators.h"
+#include "utils/iiterators.h"
 
 #include <memory>
 
@@ -75,5 +75,8 @@ class ISet {
     virtual std::unique_ptr<ISet> getEmpty() const = 0;
 
     virtual ~ISet() = default;
+
+    /* Set factories below */
+    static std::unique_ptr<ISet> createStdSet();
 };
 } // namespace utils
