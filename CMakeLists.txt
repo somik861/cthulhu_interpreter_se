@@ -3,13 +3,15 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(cthulhu_interpreter)
 
-include_directories(${CMAKE_SOURCE_DIR}/src/builtins/include)
-include_directories(${CMAKE_SOURCE_DIR}/src/interpreter/include)
-include_directories(${CMAKE_SOURCE_DIR}/src/parser/include)
-include_directories(${CMAKE_SOURCE_DIR}/src/utils/include)
+macro(add_project_module module_path)
+	include_directories("${module_path}/include")
+	file(GLOB __SRC_FILES "${module_path}/source/*.cpp")
+	set(SOURCE_FILES ${SOURCE_FILES} ${__SRC_FILES})
+endmacro()
 
-set(SOURCE_FILES ${SOURCE_FILES}
-${CMAKE_SOURCE_DIR}/src/interpreter/source/interpreter.cpp)
-
+add_project_module("${CMAKE_SOURCE_DIR}/src/builtins")
+add_project_module("${CMAKE_SOURCE_DIR}/src/interpreter")
+add_project_module("${CMAKE_SOURCE_DIR}/src/parser")
+add_project_module("${CMAKE_SOURCE_DIR}/src/utils")
 
 add_executable(cthulhu src/main.cpp ${SOURCE_FILES})

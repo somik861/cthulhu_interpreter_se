@@ -1,5 +1,8 @@
 #pragma once
 
 namespace cthu::builtins {
-class IBuiltin {};
+class IBuiltin {
+  public:
+    virtual ~IBuiltin() = default;
+};
 } // namespace cthu::builtins
