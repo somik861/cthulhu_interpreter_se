@@ -1,7 +1,11 @@
 #include "stck.h"
 
+#include "macros.h"
+
 #include "program/stack_utils.h"
 #include <format>
+
+#define _CHECK_OP_COUNT(n) CHECK_OPERANDS_COUNT("stck", n)
 
 namespace cthu::builtins::impl {
 interpreter::ExecutionState
@@ -11,6 +15,8 @@ Stck::executeOperation(const std::string& operation,
                        std::vector<std::unique_ptr<program::IDict>>& new_threads) /*  override */ {
 
     if (operation == "split") {
+        _CHECK_OP_COUNT(2);
+
         auto create_thread = [&](std::unique_ptr<program::IStack>& op_stack) {
             auto& new_dict = new_threads.emplace_back(state_dict->clone());
             new_dict->set(0, std::move(op_stack));
