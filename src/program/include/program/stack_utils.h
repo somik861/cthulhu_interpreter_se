@@ -44,4 +44,10 @@ inline std::unique_ptr<IDict> popDict(IStack* stack) {
     return details::unique_pointer_cast<IDict>(std::move(elem));
 }
 
+inline Number* peekNumber(IStack* stack) { return dynamic_cast<Number*>(stack->top()); }
+inline uint32_t peekNumberValue(IStack* stack) { return peekNumber(stack)->getValue(); }
+inline IStack* peekStack(IStack* stack) { return dynamic_cast<IStack*>(stack->top()); }
+inline IDict* peekDict(IStack* stack) { return dynamic_cast<IDict*>(stack->top()); }
+inline Instruction* peekInstruction(IStack* stack) { return dynamic_cast<Instruction*>(stack->top()); }
+
 } // namespace cthu::program::stack_utils
