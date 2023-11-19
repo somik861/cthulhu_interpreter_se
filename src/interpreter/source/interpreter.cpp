@@ -23,7 +23,7 @@ void Interpreter::initExecution(std::unique_ptr<program::Program> program,
     }
 
     // clear queue
-    m_state_execution_queue = decltype(m_state_execution_queue){};
+    m_state_execution_queue.clear();
 
     // set init dict
     auto& state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
@@ -39,15 +39,27 @@ void Interpreter::continueExecution() /* override */ {
 
     program::IStack* instruction_stack = state->state_dict->at(0);
     if (instruction_stack->empty()) {
-        state->execution_state = ProgramState::State::Finished;
+        state->execution_state = ExecutionState::Finished;
         return;
     }
 
     auto instruction = program::stack_utils::popInstruction(instruction_stack);
+    std::vector<std::unique_ptr<program::IDict>> new_threads;
     m_builtins->at(instruction->getBuiltinName())
-        ->executeOperation(instruction->getOperation(), instruction->getOperands(), state);
+        ->executeOperation(instruction->getOperation(), instruction->getOperands(), state->state_dict.get(),
+                           new_threads);
 
-    if (state->execution_state == ProgramState::State::Running)
+    for (auto& thread : new_threads) {
+        auto& new_state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
+        new_state->thread_id = m_thread_states.size() - 1;
+        new_state->execution_state = ExecutionState::Running;
+        new_state->last_line_number = 0;
+        new_state->next_line_number = 0;
+        new_state->state_dict = std::move(thread);
+        m_state_execution_queue.push_back(new_state.get());
+    }
+
+    if (state->execution_state == ExecutionState::Running)
         m_state_execution_queue.push_back(state);
 }
 ProgramState* Interpreter::getProgramState() /* override */ { return m_state_execution_queue.front(); }
@@ -64,11 +76,11 @@ std::vector<ProgramState*> Interpreter::getFinishedStates(bool include_errors /*
     std::vector<ProgramState*> out;
 
     for (auto& thread : m_thread_states) {
-        if (thread->execution_state == ProgramState::State::Running)
+        if (thread->execution_state == ExecutionState::Running)
             continue;
-        if (thread->execution_state == ProgramState::State::FinishedWithError && include_errors)
+        if (thread->execution_state == ExecutionState::FinishedWithError && include_errors)
             out.push_back(thread.get());
-        if (thread->execution_state == ProgramState::State::Finished)
+        if (thread->execution_state == ExecutionState::Finished)
             out.push_back(thread.get());
     }
 

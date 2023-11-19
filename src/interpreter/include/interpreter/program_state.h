@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interpreter/execution_state.h"
 #include "program/idict.h"
 #include "utils/iset.h"
 
@@ -30,8 +31,7 @@ class ProgramState {
 
     std::size_t thread_id = 0;
 
-    enum class State { Running, Finished, FinishedWithError };
-    State execution_state = State::Running;
+    ExecutionState execution_state = ExecutionState::Running;
     std::string error_message = "";
 };
 } // namespace cthu::interpreter
