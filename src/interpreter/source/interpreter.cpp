@@ -28,6 +28,7 @@ void Interpreter::initExecution(std::unique_ptr<program::Program> program,
     // set init dict
     auto& state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
     state->state_dict = m_program->init_dictionary->clone();
+    state->next_line_number = program::stack_utils::peekInstruction(state->state_dict->at(0))->getSourceLine();
 
     // add thread to the queue
     m_state_execution_queue.push_back(state.get());
@@ -44,23 +45,27 @@ void Interpreter::continueExecution() /* override */ {
     }
 
     auto instruction = program::stack_utils::popInstruction(instruction_stack);
+    state->last_line_number = instruction->getSourceLine();
     std::vector<std::unique_ptr<program::IDict>> new_threads;
-    m_builtins->at(instruction->getBuiltinName())
-        ->executeOperation(instruction->getOperation(), instruction->getOperands(), state->state_dict.get(),
-                           new_threads);
+    state->execution_state = m_builtins->at(instruction->getBuiltinName())
+                                 ->executeOperation(instruction->getOperation(), instruction->getOperands(),
+                                                    state->state_dict.get(), new_threads);
 
     for (auto& thread : new_threads) {
         auto& new_state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
         new_state->thread_id = m_thread_states.size() - 1;
+        new_state->state_dict = std::move(thread);
         new_state->execution_state = ExecutionState::Running;
         new_state->last_line_number = 0;
-        new_state->next_line_number = 0;
-        new_state->state_dict = std::move(thread);
+        new_state->next_line_number =
+            program::stack_utils::peekInstruction(new_state->state_dict->at(0))->getSourceLine();
         m_state_execution_queue.push_back(new_state.get());
     }
 
-    if (state->execution_state == ExecutionState::Running)
+    if (state->execution_state == ExecutionState::Running) {
         m_state_execution_queue.push_back(state);
+        state->next_line_number = program::stack_utils::peekInstruction(state->state_dict->at(0))->getSourceLine();
+    }
 }
 ProgramState* Interpreter::getProgramState() /* override */ { return m_state_execution_queue.front(); }
 ProgramState* Interpreter::getProgramState(std::size_t id) /* override */ { return m_thread_states[id].get(); }

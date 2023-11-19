@@ -14,7 +14,7 @@ class ProgramState {
     /**
      * @brief line number corresponding to the last processed line
      */
-    int last_line_number = 0;
+    std::size_t last_line_number = 0;
     /**
      * @brief number of line that will be executed next.
      *
@@ -22,7 +22,7 @@ class ProgramState {
      * If you want to change the line to be executed, please make sure that the interpreter
      * also reads and takes it into consideration, otherwise it will have no effect.
      */
-    int next_line_number = 0;
+    std::size_t next_line_number = 0;
 
     /**
      * pointer to the state dict
