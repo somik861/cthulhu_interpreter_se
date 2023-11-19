@@ -32,5 +32,6 @@ class IBuiltin {
     virtual ~IBuiltin() = default;
 
     static std::unique_ptr<IBuiltin> createBuiltin_bv32();
+    static std::unique_ptr<IBuiltin> createBuiltin_stck();
 };
 } // namespace cthu::builtins

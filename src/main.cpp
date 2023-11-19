@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
     parser->parse(source_code, program.get());
 
     interpreter->addBuiltin("bv32", cthu::builtins::IBuiltin::createBuiltin_bv32());
+    interpreter->addBuiltin("stck", cthu::builtins::IBuiltin::createBuiltin_stck());
     interpreter->initExecution(std::move(program), &log_stream);
 
     std::cout << "INIT\n";
