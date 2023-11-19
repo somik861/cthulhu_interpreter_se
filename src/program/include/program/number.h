@@ -11,7 +11,7 @@ class Number : public virtual IStackItem {
     uint32_t getValue() const { return m_value; }
 
     std::string toString(std::size_t indent = 0) const override {
-        return std::string(" ", indent) + std::format("Number: {}", m_value);
+        return std::string(indent, ' ') + std::format("Number: {}", m_value);
     }
 
     std::unique_ptr<IStackItem> cloneItem() const override { return Number::createUnique(m_value); }

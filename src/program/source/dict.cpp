@@ -34,17 +34,17 @@ std::unique_ptr<IDict> Dict::clone() const /* override */ {
 std::unique_ptr<IDict> Dict::getEmpty() const /* override */ { return IDict::createDict(m_map->getEmpty()); }
 
 std::string Dict::toString(std::size_t indent /* = 0 */) const /* override */ {
-    std::string out(" ", indent);
+    std::string out(indent, ' ');
     out += "==== DICT START ====\n";
 
     auto it = m_map->iterator();
     while (it->hasNext()) {
         const auto& [key, value] = it->next();
-        out += std::string(" ", indent + 2) + std::format("{} =>\n", key);
+        out += std::string(indent + 2, ' ') + std::format("{} =>\n", key);
         out += value->toString(indent + 2);
         out += '\n';
     }
-    out += "==== DICT END ====";
+    out += std::string(indent, ' ') + "==== DICT END ====";
 
     return out;
 }

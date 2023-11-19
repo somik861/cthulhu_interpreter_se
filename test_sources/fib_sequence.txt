@@ -1,0 +1,63 @@
+.struct bv32 builtin
+
+# set value n to compute the nth fib number
+arg_stack:
+   $0
+
+result:
+# its empty now, but the result will be here
+
+# pops arg_stack and computs result for numbers <= 1, otherwise breaks
+fib_function_lt1_impl:
+	bv32 dup 4 4 1
+	bv32 const 2 1
+
+	bv32 lt 1 1 4
+	bv32 move 4 1
+
+	# breaks if not < 2
+	bv32 guard_nonzero 1
+
+	# compute 0 and 1
+	bv32 dup 4 4 1
+	bv32 const 1 1
+
+	bv32 lt 1 1 4
+	bv32 move 4 1
+
+	bv32 dup 4 4 1
+	bv32 mul 1 1 5
+
+
+fib_function_lt1:
+	@fib_function_lt1_impl
+
+# pops arg_stack and either computes the result, or puts back subresults and calls itself
+fib_function_gt1_impl:
+	bv32 dup 4 4 1
+	bv32 const 2 1
+	bv32 lt 1 1 4
+	bv32 move 4 1
+
+	# breaks if not < 2
+	bv32 guard_zero 1
+
+fib_function_gt1:
+	@fib_function_gt1_impl
+
+empty:
+
+run:
+	stck dup 2 2 1
+	stck dup 3 3 1
+	stck split 1 1
+
+%init:
+	0 => @run
+	1 => @empty
+	2 => @fib_function_lt1
+	3 => @fib_function_gt1
+	# the argument
+	4 => @arg_stack
+	# result
+	5 => @result

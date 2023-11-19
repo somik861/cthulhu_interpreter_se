@@ -26,13 +26,13 @@ std::unique_ptr<StackVector> StackVector::cloneRaw() const {
 }
 
 std::string StackVector::toString(std::size_t indent /* = 0 */) const /* override */ {
-    std::string out(" ", indent);
+    std::string out(indent, ' ');
     out += "------- TOP -------\n";
     for (auto it = m_vector.crbegin(); it != m_vector.crend(); ++it) {
         out += (*it)->toString(indent + 2);
         out += '\n';
     }
-    out += std::string(" ", indent);
+    out += std::string(indent, ' ');
     out += "----- BOTTOM ------";
     return out;
 }

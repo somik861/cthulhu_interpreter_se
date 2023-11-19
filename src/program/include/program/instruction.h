@@ -20,7 +20,7 @@ class Instruction : public virtual IStackItem {
 
     std::string toString(std::size_t indent = 0) const override {
         auto out =
-            std::string(" ", indent) + std::format("{}:{} instruction: {}", m_source_line, m_builtin, m_operation);
+            std::string(indent, ' ') + std::format("{}:{} instruction: {}", m_source_line, m_builtin, m_operation);
         for (const auto& op : m_operands) {
             out += " ";
             out += op;
