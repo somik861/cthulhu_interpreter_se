@@ -6,6 +6,8 @@
 #include "utils/imap.h"
 #include "utils/iset.h"
 
+#include <string>
+
 namespace cthu::program {
 class IDict : public virtual IStackItem {
   public:

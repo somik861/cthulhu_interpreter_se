@@ -1,0 +1,21 @@
+.struct bv32 builtin
+
+empty:
+
+stack0:
+	bv32 add 1 1 2
+
+stack1:
+  	$3
+	$4
+
+%init:
+	0 => @stack0
+	1 => @stack1
+	2 => @empty
+	3 => @empty
+	4 => @empty
+	5 => @empty
+
+# Expected result:
+# init[2]->top() == number 7

@@ -7,8 +7,6 @@ class Bv32 : public virtual IBuiltin {
   public:
     void executeOperation(const std::string& operation,
                           const std::vector<std::string>& operands,
-                          interpreter::IProgramState* state) override {
-        throw std::invalid_argument("Operation not implemented");
-    }
+                          interpreter::ProgramState* state) override;
 };
 } // namespace cthu::builtins::impl

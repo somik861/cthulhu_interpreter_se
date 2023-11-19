@@ -1,7 +1,7 @@
 #pragma once
 
 #include "builtins/ibuiltin.h"
-#include "interpreter/iprogram_state.h"
+#include "interpreter/program_state.h"
 #include "program/iprogram.h"
 #include "utils/iset.h"
 
@@ -71,20 +71,7 @@ class IInterpreter {
      * @return program state or nullptr (if no valid state that
      * can be returned exists)
      */
-    virtual std::shared_ptr<IProgramState> getProgramState() = 0;
-
-    /**
-     * @brief Get state of the program of last run thread.
-     *
-     * Use this to obtain information about the current state.
-     * This can mean either at the end of the execution or when program is
-     * execution is stopped. You can also call this after initExecution(...) to
-     * check initial state.
-     *
-     * @return deep-copy of program state or nullptr (if no valid state that
-     * can be returned exists)
-     */
-    virtual std::shared_ptr<IProgramState> getProgramState() const = 0;
+    virtual ProgramState* getProgramState() = 0;
 
     /**
      * @brief Get state of the program of thread with given id
@@ -100,20 +87,7 @@ class IInterpreter {
      * @return program state or nullptr (if no valid state that
      * can be returned exists)
      */
-    virtual std::shared_ptr<IProgramState> getProgramState(std::size_t id) = 0;
-
-    /**
-     * @brief Get state of the program of thread with given id
-     *
-     * Use this to obtain information about the current state.
-     * This can mean either at the end of the execution or when program is
-     * execution is stopped. You can also call this after initExecution(...) to
-     * check initial state.
-     *
-     * @return deep-copy of program state or nullptr (if no valid state that
-     * can be returned exists)
-     */
-    virtual std::shared_ptr<IProgramState> getProgramState(std::size_t id) const = 0;
+    virtual ProgramState* getProgramState(std::size_t id) = 0;
 
     /**
      * @brief Get set of id's of running threads
@@ -121,6 +95,14 @@ class IInterpreter {
      * @return set of id's of running threads
      */
     virtual std::unique_ptr<utils::ISet<std::size_t>> getRunningThreads() const = 0;
+
+    /**
+     * @brief Get states that already finished
+     *
+     * @param[in] include_errors        include states that ended with errors
+     * @return                          finished states
+     */
+    virtual std::vector<ProgramState*> getFinishedStates(bool include_errors = false) = 0;
 
     /**
      * @brief Get max thread id
@@ -135,5 +117,6 @@ class IInterpreter {
     virtual ~IInterpreter() = default;
 
     static std::unique_ptr<IInterpreter> createInterpreterDummy();
+    static std::unique_ptr<IInterpreter> createInterpreter();
 };
 } // namespace cthu::interpreter

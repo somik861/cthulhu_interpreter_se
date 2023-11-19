@@ -1,5 +1,7 @@
 #include "dict.h"
 
+#include <format>
+
 namespace cthu::program::impl {
 Dict::Dict(std::unique_ptr<IDict::mapping_type> backend) : m_map(std::move(backend)) {}
 
@@ -24,8 +26,28 @@ std::unique_ptr<utils::ISet<std::size_t>> Dict::getKeys() const /* override */ {
         set->insert(iterator->next().first);
     return set;
 }
-std::unique_ptr<IDict> Dict::clone() const /* override */ { return IDict::createDict(m_map->clone()); }
+
+std::unique_ptr<IDict> Dict::clone() const /* override */ {
+    auto rv = IDict::createDict(m_map->clone());
+    return rv;
+}
 std::unique_ptr<IDict> Dict::getEmpty() const /* override */ { return IDict::createDict(m_map->getEmpty()); }
+
+std::string Dict::toString(std::size_t indent /* = 0 */) const /* override */ {
+    std::string out(" ", indent);
+    out += "==== DICT START ====\n";
+
+    auto it = m_map->iterator();
+    while (it->hasNext()) {
+        const auto& [key, value] = it->next();
+        out += std::string(" ", indent + 2) + std::format("{} =>\n", key);
+        out += value->toString(indent + 2);
+        out += '\n';
+    }
+    out += "==== DICT END ====";
+
+    return out;
+}
 
 std::unique_ptr<IStackItem> Dict::cloneItem() const /* override */ { return clone(); }
 } // namespace cthu::program::impl

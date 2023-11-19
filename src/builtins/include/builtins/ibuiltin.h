@@ -1,7 +1,8 @@
 #pragma once
 
-#include "interpreter/iprogram_state.h"
+#include "interpreter/program_state.h"
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -19,8 +20,10 @@ class IBuiltin {
      */
     virtual void executeOperation(const std::string& operation,
                                   const std::vector<std::string>& operands,
-                                  interpreter::IProgramState* state) = 0;
+                                  interpreter::ProgramState* state) = 0;
 
+    // Just to be consistent
+    std::unique_ptr<IBuiltin> clone() { throw std::runtime_error("Builtin can not be copied"); }
     virtual ~IBuiltin() = default;
 
     static std::unique_ptr<IBuiltin> createBuiltin_bv32();

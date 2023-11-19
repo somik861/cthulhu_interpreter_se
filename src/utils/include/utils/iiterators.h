@@ -20,12 +20,6 @@ class IIterator {
      * @return		value after advancing the iterator
      */
     virtual value_type& next() = 0;
-    /**
-     * @brief Get current iterator value
-     *
-     * @return		current iterator value
-     */
-    virtual value_type& value() = 0;
 
     virtual ~IIterator() = default;
 };

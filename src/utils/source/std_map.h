@@ -24,7 +24,7 @@ class StdMap : public virtual IMap<key_t, value_t> {
         if (!existed || replace)
             m_map[key] = std::move(value);
 
-        return existed;
+        return !existed;
     }
     bool contains(const key_type& key) const override { return m_map.contains(key); }
     bool erase(const key_type& key) override { return bool(m_map.erase(key)); }

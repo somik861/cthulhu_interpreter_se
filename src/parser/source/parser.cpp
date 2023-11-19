@@ -1,5 +1,8 @@
 #include "parser.h"
 
+#include "program/instruction.h"
+#include "program/number.h"
+
 #include <format>
 #include <map>
 #include <string>
@@ -47,6 +50,7 @@ void Parser::parse(std::istream& source_code, program::IProgram* program) /* ove
         if (view.ends_with(":") && !view.starts_with("%")) {
             view.remove_suffix(1);
             current_lines = &m_stack_lines[std::string(view)];
+            continue;
         }
 
         // dict start
@@ -54,6 +58,7 @@ void Parser::parse(std::istream& source_code, program::IProgram* program) /* ove
             view.remove_prefix(1);
             view.remove_suffix(1);
             current_lines = &m_dict_lines[std::string(view)];
+            continue;
         }
 
         // important line
@@ -70,13 +75,57 @@ void Parser::parse(std::istream& source_code, program::IProgram* program) /* ove
 std::unique_ptr<program::IStack> Parser::parseStack(const lines_t& lines) {
     auto stack = program::IStack::createStackVector();
 
+    for (auto it = lines.crbegin(); it != lines.crend(); ++it) {
+        const auto& [num, line] = *it;
+        std::string_view view(line);
+
+        // number
+        if (view.starts_with("$")) {
+            view.remove_prefix(1);
+            uint32_t value = uint32_t(std::stoll(std::string(view)));
+            stack->push(program::Number::createUnique(value));
+            continue;
+        }
+
+        // stack
+        if (view.starts_with("@")) {
+            view.remove_prefix(1);
+            stack->push(parseStack(m_stack_lines[std::string(view)]));
+            continue;
+        }
+
+        // dictionary
+        if (view.starts_with("%")) {
+            view.remove_prefix(1);
+            stack->push(parseStack(m_dict_lines[std::string(view)]));
+            continue;
+        }
+
+        auto extract_word = [&]() -> std::string {
+            std::size_t idx = view.find_first_of(" ");
+            std::string out = std::string(view.substr(0, idx));
+            view.remove_prefix(out.size());
+            trim_view(view);
+            return out;
+        };
+
+        std::string builtin = extract_word();
+        std::string operation = extract_word();
+
+        std::vector<std::string> operands;
+        while (!view.empty())
+            operands.push_back(extract_word());
+        stack->push(
+            program::Instruction::createUnique(std::move(builtin), std::move(operation), std::move(operands), num));
+    }
+
     return stack;
 }
 std::unique_ptr<program::IDict> Parser::parseDict(const lines_t& lines) {
     auto dict = program::IDict::createDict();
 
     for (const auto& [_, line] : lines) {
-        std::size_t pos;
+        std::size_t pos = 0;
         auto key = std::stoll(line, &pos);
 
         std::string_view view(line);
@@ -84,6 +133,7 @@ std::unique_ptr<program::IDict> Parser::parseDict(const lines_t& lines) {
         trim_view(view);
         view.remove_prefix(2); // remove "=>"
         trim_view(view);
+        view.remove_prefix(1); // remove "@"
         dict->set(std::size_t(key), parseStack(m_stack_lines.at(std::string(view))));
     }
 

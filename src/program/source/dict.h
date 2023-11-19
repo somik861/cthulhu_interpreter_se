@@ -15,7 +15,9 @@ class Dict : public virtual IDict {
     std::unique_ptr<IDict> getEmpty() const override;
     std::unique_ptr<IStackItem> cloneItem() const override;
 
+    std::string toString(std::size_t indent = 0) const override;
+
   private:
-    std::unique_ptr<IDict::mapping_type> m_map;
+    std::unique_ptr<IDict::mapping_type> m_map = nullptr;
 };
 } // namespace cthu::program::impl

@@ -17,6 +17,7 @@ class StackVector : public IStack {
     std::unique_ptr<IStack> clone() const override;
     std::unique_ptr<IStackItem> cloneItem() const override;
     std::unique_ptr<IStack> getEmpty() const override;
+    std::string toString(std::size_t indent = 0) const override;
 
   private:
     std::unique_ptr<StackVector> cloneRaw() const;
