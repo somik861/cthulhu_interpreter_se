@@ -9,13 +9,12 @@ namespace cthu::interpreter::impl {
 void Interpreter::addBuiltin(const std::string& name, std::unique_ptr<builtins::IBuiltin> builtin) /* override */ {
     assert(m_builtins->insert(name, std::move(builtin)));
 }
-void Interpreter::initExecution(std::unique_ptr<program::IProgram> program,
+void Interpreter::initExecution(std::unique_ptr<program::Program> program,
                                 std::ostream* log_stream /* = nullptr */) /* override */ {
     m_program = std::move(program);
     m_log_stream = log_stream;
 
-    auto req_builtins = m_program->getRequiredBuiltins();
-    auto iter = req_builtins->iterator();
+    auto iter = m_program->required_builtins->iterator();
     while (iter->hasNext()) {
         std::string builtin = iter->next();
 
@@ -28,7 +27,7 @@ void Interpreter::initExecution(std::unique_ptr<program::IProgram> program,
 
     // set init dict
     auto& state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
-    state->state_dict = m_program->getInitDictionary();
+    state->state_dict = m_program->init_dictionary->clone();
 
     // add thread to the queue
     m_state_execution_queue.push_back(state.get());

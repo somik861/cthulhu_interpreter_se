@@ -2,7 +2,7 @@
 
 #include "builtins/ibuiltin.h"
 #include "interpreter/program_state.h"
-#include "program/iprogram.h"
+#include "program/program.h"
 #include "utils/iset.h"
 
 #include <memory>
@@ -32,7 +32,7 @@ class IInterpreter {
      * @param[in] log_stream		stream to use for logs, no logs will be
      * outputted if log_stream is nullptr
      */
-    virtual void initExecution(std::unique_ptr<program::IProgram> code, std::ostream* log_stream = nullptr) = 0;
+    virtual void initExecution(std::unique_ptr<program::Program> code, std::ostream* log_stream = nullptr) = 0;
 
     /**
      * @brief Return information whether the interpreter is ready to continue
@@ -53,7 +53,7 @@ class IInterpreter {
      * stopped by interpreter and is in valid state. Call canContinue() to
      * validate the state.
      *
-     * Calling this function when canContinue() returns false does nothing.
+     * Calling this function when canContinue() returns false is undefined behaviour.
      */
     virtual void continueExecution() = 0;
 

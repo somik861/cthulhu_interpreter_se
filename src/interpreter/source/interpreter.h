@@ -9,7 +9,7 @@ namespace cthu::interpreter::impl {
 class Interpreter : public virtual IInterpreter {
   public:
     void addBuiltin(const std::string& name, std::unique_ptr<builtins::IBuiltin> builtin) override;
-    void initExecution(std::unique_ptr<program::IProgram> program, std::ostream* log_stream = nullptr) override;
+    void initExecution(std::unique_ptr<program::Program> program, std::ostream* log_stream = nullptr) override;
     bool canContinue() const override;
     void continueExecution() override;
     ProgramState* getProgramState() override;
@@ -21,7 +21,7 @@ class Interpreter : public virtual IInterpreter {
   private:
     std::unique_ptr<utils::IMap<std::string, std::unique_ptr<builtins::IBuiltin>>> m_builtins =
         utils::IMap<std::string, std::unique_ptr<builtins::IBuiltin>>::createStdMap();
-    std::unique_ptr<program::IProgram> m_program;
+    std::unique_ptr<program::Program> m_program;
     std::ostream* m_log_stream = nullptr;
 
     // all threads in the queue has to be in Running state

@@ -9,7 +9,7 @@
 namespace cthu::parser::impl {
 class Parser : public virtual IParser {
   public:
-    void parse(std::istream& source_code, program::IProgram* program) override;
+    void parse(std::istream& source_code, program::Program* program) override;
 
   private:
     using lines_t = std::vector<std::pair<std::size_t, std::string>>;

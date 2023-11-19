@@ -19,8 +19,8 @@ void trim_view(std::string_view& view) {
 } // namespace
 
 namespace cthu::parser::impl {
-void Parser::parse(std::istream& source_code, program::IProgram* program) /* override */ {
-    auto required_builtins = utils::ISet<std::string>::createStdSet();
+void Parser::parse(std::istream& source_code, program::Program* program) /* override */ {
+    program->required_builtins = utils::ISet<std::string>::createStdSet();
 
     std::size_t line_number = 0;
     lines_t* current_lines = nullptr;
@@ -42,7 +42,7 @@ void Parser::parse(std::istream& source_code, program::IProgram* program) /* ove
             view.remove_prefix(8); // remove ".struct "
             view.remove_suffix(8); // remove " builtin"
             trim_view(view);
-            required_builtins->insert(std::string(view));
+            program->required_builtins->insert(std::string(view));
             continue;
         }
 
@@ -68,8 +68,7 @@ void Parser::parse(std::istream& source_code, program::IProgram* program) /* ove
         current_lines->emplace_back(line_number, std::string(view));
     }
 
-    program->setRequriedBuiltins(std::move(required_builtins));
-    program->setInitDictionary(parseDict(m_dict_lines.at("init")));
+    program->init_dictionary = parseDict(m_dict_lines.at("init"));
 }
 
 std::unique_ptr<program::IStack> Parser::parseStack(const lines_t& lines) {

@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
     auto parser = cthu::parser::IParser::createParser();
     auto interpreter = cthu::interpreter::IInterpreter::createInterpreter();
-    auto program = cthu::program::IProgram::createProgram();
+    auto program = std::unique_ptr<cthu::program::Program>();
     parser->parse(source_code, program.get());
 
     interpreter->addBuiltin("bv32", cthu::builtins::IBuiltin::createBuiltin_bv32());

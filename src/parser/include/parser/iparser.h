@@ -1,6 +1,6 @@
 #pragma once
 
-#include "program/iprogram.h"
+#include "program/program.h"
 
 #include <istream>
 
@@ -17,7 +17,7 @@ class IParser {
      * @oaran[out] program                   program to fill
      * @return                               program
      */
-    virtual void parse(std::istream& source_code, program::IProgram* program) = 0;
+    virtual void parse(std::istream& source_code, program::Program* program) = 0;
 
     virtual ~IParser() = default;
 
