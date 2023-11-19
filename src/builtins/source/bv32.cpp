@@ -48,6 +48,20 @@ Bv32::executeOperation(const std::string& operation,
         return interpreter::ExecutionState::Running;
     }
 
+    if (operation == "lt") {
+        _CHECK_OP_COUNT(3);
+
+        std::size_t lhs_stack = std::stoul(operands[0]);
+        std::size_t rhs_stack = std::stoul(operands[1]);
+        std::size_t res_stack = std::stoul(operands[2]);
+
+        uint32_t lhs = program::stack_utils::popNumberValue(state_dict->at(lhs_stack));
+        uint32_t rhs = program::stack_utils::popNumberValue(state_dict->at(rhs_stack));
+        state_dict->at(res_stack)->push(program::Number::createUnique(uint32_t(lhs < rhs)));
+
+        return interpreter::ExecutionState::Running;
+    }
+
     throw std::invalid_argument(std::format("Invalid operation: {}\n", operation));
 }
 } // namespace cthu::builtins::impl

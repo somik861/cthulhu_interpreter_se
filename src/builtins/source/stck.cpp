@@ -34,6 +34,20 @@ Stck::executeOperation(const std::string& operation,
         return interpreter::ExecutionState::FinishedWithError;
     }
 
+    if (operation == "dup") {
+        _CHECK_OP_COUNT(3);
+
+        std::size_t source = std::stoul(operands[0]);
+        std::size_t dest1 = std::stoul(operands[1]);
+        std::size_t dest2 = std::stoul(operands[2]);
+
+        auto stack = program::stack_utils::popStack(state_dict->at(source));
+        state_dict->at(dest1)->push(stack->cloneItem());
+        state_dict->at(dest2)->push(std::move(stack));
+
+        return interpreter::ExecutionState::Running;
+    }
+
     throw std::invalid_argument(std::format("Invalid operation: {}\n", operation));
 }
 } // namespace cthu::builtins::impl
