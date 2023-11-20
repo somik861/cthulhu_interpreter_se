@@ -7,7 +7,8 @@
 
 namespace cthu::interpreter::impl {
 void Interpreter::addBuiltin(const std::string& name, std::unique_ptr<builtins::IBuiltin> builtin) /* override */ {
-    assert(m_builtins->insert(name, std::move(builtin)));
+    assert(!m_builtins->contains(name));
+    m_builtins->insert(name, std::move(builtin));
 }
 void Interpreter::initExecution(std::unique_ptr<program::Program> program,
                                 std::ostream* log_stream /* = nullptr */) /* override */ {

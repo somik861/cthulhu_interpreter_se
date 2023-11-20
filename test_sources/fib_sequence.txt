@@ -2,7 +2,7 @@
 
 # set value n to compute the nth fib number
 arg_stack:
-   $15
+   $30
 
 result:
 # its empty now, but the result will be here
