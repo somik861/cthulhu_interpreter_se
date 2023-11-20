@@ -12,7 +12,7 @@ class IMap {
     /**
      * @brief Get reference on object located at key
      *
-     * If no such key exists, the std::out_of_range is thrown.
+     * It is UB when key does not exist.
      *
      * @param[in] key        key of the object
      * @return              reference to an object located at the key
@@ -21,12 +21,22 @@ class IMap {
     /**
      * @brief Get reference on object located at key
      *
-     * If no such key exists, the std::out_of_range is thrown.
+     * It is UB when key does not exist.
      *
      * @param[in] key        key of the object
      * @return              reference to an object located at the key
      */
     virtual const value_type& at(const key_type& key) const = 0;
+
+    /**
+     * @brief Get object located at given key and erase it from the map
+     *
+     * It is UB when key does not exist.
+     *
+     * @param[in] key        key of the object
+     * @return              reference to an object located at the key
+     */
+    virtual value_type pop(const key_type& key) = 0;
 
     /**
      * @brief Insert key-value pair to the map
@@ -89,6 +99,8 @@ class IMap {
 
     /**
      * @brief Get a copy of the map
+     *
+     * If an value_type is unique_ptr, method clone() is called.
      *
      * This function throws std::domain_error if value_type is not copy-able.
      *

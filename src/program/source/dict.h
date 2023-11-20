@@ -14,6 +14,8 @@ class Dict : public virtual IDict {
     std::unique_ptr<IDict> clone() const override;
     std::unique_ptr<IDict> getEmpty() const override;
     std::unique_ptr<IStackItem> cloneItem() const override;
+    bool contains(std::size_t idx) const override;
+    std::unique_ptr<IStack> pop(std::size_t idx) override;
 
     std::string toString(std::size_t indent = 0) const override;
 

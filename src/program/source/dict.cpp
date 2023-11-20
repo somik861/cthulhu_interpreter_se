@@ -6,18 +6,29 @@ namespace cthu::program::impl {
 Dict::Dict(std::unique_ptr<IDict::mapping_type> backend) : m_map(std::move(backend)) {}
 
 IStack* Dict::at(std::size_t idx) /* override */ {
-    if (m_map->contains(idx))
-        return m_map->at(idx).get();
-    return nullptr;
+    if (!m_map->contains(idx))
+        throw std::out_of_range(std::format("dictionary does not contain index {}\n", idx));
+
+    return m_map->at(idx).get();
 }
 const IStack* Dict::at(std::size_t idx) const /* override */ {
-    if (m_map->contains(idx))
-        return m_map->at(idx).get();
-    return nullptr;
+    if (!m_map->contains(idx))
+        throw std::out_of_range(std::format("dictionary does not contain index {}\n", idx));
+
+    return m_map->at(idx).get();
 }
 void Dict::set(std::size_t idx, std::unique_ptr<IStack> stack) /* override */ {
     m_map->insert(idx, std::move(stack), true);
 }
+
+bool Dict::contains(std::size_t idx) const /* override */ { return m_map->contains(idx); }
+std::unique_ptr<IStack> Dict::pop(std::size_t idx) /* override */ {
+    if (!m_map->contains(idx))
+        throw std::out_of_range(std::format("dictionary does not contain index {}\n", idx));
+
+    return m_map->pop(idx);
+}
+
 std::unique_ptr<utils::ISet<std::size_t>> Dict::getKeys() const /* override */ {
     auto set = utils::ISet<std::size_t>::createStdSet();
 

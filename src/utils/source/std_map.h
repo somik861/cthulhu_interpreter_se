@@ -18,6 +18,11 @@ class StdMap : public virtual IMap<key_t, value_t> {
 
     value_type& at(const key_type& key) override { return m_map.at(key); }
     const value_type& at(const key_type& key) const override { return m_map.at(key); }
+    value_type pop(const key_type& key) override {
+        auto rv = std::move(m_map.at(key));
+        m_map.erase(key);
+        return rv;
+    };
     bool insert(const key_type& key, value_type value, bool replace = false) override {
         bool existed = m_map.contains(key);
 

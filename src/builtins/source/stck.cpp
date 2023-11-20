@@ -48,6 +48,31 @@ Stck::executeOperation(const std::string& operation,
         return interpreter::ExecutionState::Running;
     }
 
+    if (operation == "drop") {
+        _CHECK_OP_COUNT(1);
+
+        std::size_t source = std::stoul(operands[0]);
+
+        auto stack = program::stack_utils::popStack(state_dict->at(source));
+
+        return interpreter::ExecutionState::Running;
+    }
+
+    if (operation == "pivot") {
+        _CHECK_OP_COUNT(3);
+
+        std::size_t old = std::stoul(operands[0]);
+        std::size_t new_ = std::stoul(operands[1]);
+        std::size_t save = std::stoul(operands[2]);
+
+        auto old_stack = state_dict->pop(old);
+        auto new_stack = program::stack_utils::popStack(state_dict->at(new_));
+        state_dict->set(old, std::move(new_stack));
+        state_dict->at(save)->push(std::move(old_stack));
+
+        return interpreter::ExecutionState::Running;
+    }
+
     throw std::invalid_argument(std::format("Invalid operation: {}\n", operation));
 }
 } // namespace cthu::builtins::impl
