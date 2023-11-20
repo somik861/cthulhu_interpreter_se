@@ -10,3 +10,4 @@ cmake ..
 cmake --build . --config Release
 
 Copy-Item Release\cthulhu.exe ..\benchmark\bin -Force
+Set-Location ..\benchmark
