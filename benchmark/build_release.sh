@@ -5,7 +5,7 @@ mkdir -p bin
 
 cd ..
 rm -rf build
-mkdir -p buld
+mkdir -p build
 cd build
 
 cmake ..
