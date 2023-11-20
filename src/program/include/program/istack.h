@@ -70,6 +70,6 @@ class IStack : public virtual IStackItem {
      */
     virtual std::unique_ptr<IStack> getEmpty() const = 0;
 
-    static std::unique_ptr<IStack> createStackVector();
+    static std::unique_ptr<IStack> createStackVector(std::string name = "");
 };
 } // namespace cthu::program

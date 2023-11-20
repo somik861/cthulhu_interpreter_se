@@ -9,17 +9,19 @@
 #define _TERNARY_NUM(op) TERNARY_NUMBER_OPERATION("bv32", op)
 
 namespace cthu::builtins::impl {
-interpreter::ExecutionState
-Bv32::executeOperation(const std::string& operation,
-                       const std::vector<std::string>& operands,
-                       program::IDict* state_dict,
-                       std::vector<std::unique_ptr<program::IDict>>& new_threads) /*  override */ {
+interpreter::ExecutionState Bv32::executeOperation(
+    const std::string& operation,
+    const std::vector<std::string>& operands,
+    program::IDict* state_dict,
+    std::vector<std::unique_ptr<program::IDict>>& new_threads) /*  override */ {
     if (operation == "add")
         _TERNARY_NUM(+);
     if (operation == "lt")
         _TERNARY_NUM(<);
     if (operation == "mul")
         _TERNARY_NUM(*);
+    if (operation == "sub")
+        _TERNARY_NUM(-);
 
     if (operation == "swap") {
         _CHECK_OP_COUNT(2);

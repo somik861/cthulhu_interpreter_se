@@ -82,6 +82,7 @@ class IDict : public virtual IStackItem {
      */
     virtual std::unique_ptr<IDict> getEmpty() const = 0;
 
-    static std::unique_ptr<IDict> createDict(std::unique_ptr<mapping_type> backend = mapping_type::createStdMap());
+    static std::unique_ptr<IDict> createDict(std::string name = "",
+                                             std::unique_ptr<mapping_type> backend = mapping_type::createStdMap());
 };
 } // namespace cthu::program

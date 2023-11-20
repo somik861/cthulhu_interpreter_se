@@ -68,11 +68,11 @@ void Parser::parse(std::istream& source_code, program::Program* program) /* over
         current_lines->emplace_back(line_number, std::string(view));
     }
 
-    program->init_dictionary = parseDict(m_dict_lines.at("init"));
+    program->init_dictionary = parseDict(m_dict_lines.at("init"), "init");
 }
 
-std::unique_ptr<program::IStack> Parser::parseStack(const lines_t& lines) {
-    auto stack = program::IStack::createStackVector();
+std::unique_ptr<program::IStack> Parser::parseStack(const lines_t& lines, const std::string& name) {
+    auto stack = program::IStack::createStackVector(name);
 
     for (auto it = lines.crbegin(); it != lines.crend(); ++it) {
         const auto& [num, line] = *it;
@@ -89,14 +89,14 @@ std::unique_ptr<program::IStack> Parser::parseStack(const lines_t& lines) {
         // stack
         if (view.starts_with("@")) {
             view.remove_prefix(1);
-            stack->push(parseStack(m_stack_lines[std::string(view)]));
+            stack->push(parseStack(m_stack_lines.at(std::string(view)), std::string(view)));
             continue;
         }
 
         // dictionary
         if (view.starts_with("%")) {
             view.remove_prefix(1);
-            stack->push(parseStack(m_dict_lines[std::string(view)]));
+            stack->push(parseStack(m_dict_lines.at(std::string(view)), std::string(view)));
             continue;
         }
 
@@ -120,8 +120,8 @@ std::unique_ptr<program::IStack> Parser::parseStack(const lines_t& lines) {
 
     return stack;
 }
-std::unique_ptr<program::IDict> Parser::parseDict(const lines_t& lines) {
-    auto dict = program::IDict::createDict();
+std::unique_ptr<program::IDict> Parser::parseDict(const lines_t& lines, const std::string& name) {
+    auto dict = program::IDict::createDict(name);
 
     for (const auto& [_, line] : lines) {
         std::size_t pos = 0;
@@ -133,7 +133,7 @@ std::unique_ptr<program::IDict> Parser::parseDict(const lines_t& lines) {
         view.remove_prefix(2); // remove "=>"
         trim_view(view);
         view.remove_prefix(1); // remove "@"
-        dict->set(std::size_t(key), parseStack(m_stack_lines.at(std::string(view))));
+        dict->set(std::size_t(key), parseStack(m_stack_lines.at(std::string(view)), std::string(view)));
     }
 
     return dict;

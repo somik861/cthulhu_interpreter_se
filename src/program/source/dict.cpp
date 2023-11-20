@@ -3,7 +3,10 @@
 #include <format>
 
 namespace cthu::program::impl {
-Dict::Dict(std::unique_ptr<IDict::mapping_type> backend) : m_map(std::move(backend)) {}
+Dict::Dict(std::string name /* = "" */,
+           std::unique_ptr<IDict::mapping_type> backend /* = mapping_type::createStdMap() */)
+    : m_map(std::move(backend)),
+      m_name(std::move(name)) {}
 
 IStack* Dict::at(std::size_t idx) /* override */ {
     if (!m_map->contains(idx))
@@ -39,10 +42,10 @@ std::unique_ptr<utils::ISet<std::size_t>> Dict::getKeys() const /* override */ {
 }
 
 std::unique_ptr<IDict> Dict::clone() const /* override */ {
-    auto rv = IDict::createDict(m_map->clone());
+    auto rv = IDict::createDict(m_name, m_map->clone());
     return rv;
 }
-std::unique_ptr<IDict> Dict::getEmpty() const /* override */ { return IDict::createDict(m_map->getEmpty()); }
+std::unique_ptr<IDict> Dict::getEmpty() const /* override */ { return IDict::createDict("", m_map->getEmpty()); }
 
 std::string Dict::toString(std::size_t indent /* = 0 */) const /* override */ {
     std::string out(indent, ' ');
@@ -60,12 +63,30 @@ std::string Dict::toString(std::size_t indent /* = 0 */) const /* override */ {
     return out;
 }
 
+std::string Dict::toShortString(bool is_on_top /* = true */) const /* override */ {
+    if (!is_on_top)
+        return std::string("dict") + (m_name.empty() ? "" : ":") + m_name;
+    std::string out = m_name + "{\n";
+
+    auto it = m_map->iterator();
+    while (it->hasNext()) {
+        const auto& [key, value] = it->next();
+        out += std::format("  {} => ", key);
+        out += value->toShortString(true);
+        out += '\n';
+    }
+    out += "}";
+
+    return out;
+}
+
 std::unique_ptr<IStackItem> Dict::cloneItem() const /* override */ { return clone(); }
 } // namespace cthu::program::impl
 
 namespace cthu::program {
-/* static */ std::unique_ptr<IDict>
-IDict::createDict(std::unique_ptr<mapping_type> backend /* = mapping_type::createStdMap() */) {
-    return std::make_unique<impl::Dict>(std::move(backend));
+/* static */ std::unique_ptr<IDict> IDict::createDict(
+    std::string name /* = "" */,
+    std::unique_ptr<mapping_type> backend /* = mapping_type::createStdMap() */) {
+    return std::make_unique<impl::Dict>(std::move(name), std::move(backend));
 }
 } // namespace cthu::program

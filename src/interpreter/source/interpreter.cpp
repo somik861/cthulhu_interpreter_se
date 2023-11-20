@@ -48,8 +48,10 @@ void Interpreter::continueExecution() /* override */ {
     state->last_line_number = instruction->getSourceLine();
     std::vector<std::unique_ptr<program::IDict>> new_threads;
     state->execution_state = m_builtins->at(instruction->getBuiltinName())
-                                 ->executeOperation(instruction->getOperation(), instruction->getOperands(),
-                                                    state->state_dict.get(), new_threads);
+                                 ->executeOperation(instruction->getOperation(),
+                                                    instruction->getOperands(),
+                                                    state->state_dict.get(),
+                                                    new_threads);
 
     for (auto& thread : new_threads) {
         auto& new_state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
@@ -62,7 +64,8 @@ void Interpreter::continueExecution() /* override */ {
     }
 
     if (state->execution_state == ExecutionState::Running) {
-        m_state_execution_queue.push_back(state);
+        // Make the next execution prefer current state
+        m_state_execution_queue.push_front(state);
         state->next_line_number = getNextInstructionLine(state->state_dict.get());
     }
 }

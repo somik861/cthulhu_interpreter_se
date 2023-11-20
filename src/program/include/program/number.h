@@ -7,12 +7,19 @@
 namespace cthu::program {
 class Number : public virtual IStackItem {
   public:
-    Number(uint32_t value) : m_value(value) {}
+    Number(uint32_t value)
+        : m_value(value) {}
     uint32_t getValue() const { return m_value; }
 
     std::string toString(std::size_t indent = 0) const override {
         return std::string(indent, ' ') + std::format("Number: {}", m_value);
     }
+
+    std::string toShortString(bool is_on_top /* = true */) const override {
+        if (!is_on_top)
+            return std::to_string(m_value);
+        return toString();
+    };
 
     std::unique_ptr<IStackItem> cloneItem() const override { return Number::createUnique(m_value); }
 

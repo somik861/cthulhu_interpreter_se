@@ -2,8 +2,10 @@
 
 #include "interpreter/execution_state.h"
 #include "program/idict.h"
+#include "program/stack_utils.h"
 #include "utils/iset.h"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -33,5 +35,23 @@ class ProgramState {
 
     ExecutionState execution_state = ExecutionState::Running;
     std::string error_message = "";
+
+    std::string toString() const {
+        std::string out = std::format("Last line number: {}\n", last_line_number);
+        out += std::format("Next line number: {}\n", next_line_number);
+        out += std::format("Thread ID: {}\n", thread_id);
+        out += std::format("Running: {}\n", execution_state == ExecutionState::Running);
+        if (!error_message.empty())
+            out += std::format("Error message: {}\n", error_message);
+
+        auto instruction_stack = state_dict->at(0);
+        if (!instruction_stack->empty())
+            out += std::format("Next execution: {}\n",
+                               program::stack_utils::peekInstruction(instruction_stack)->toString());
+
+        out += std::format("State: {}", state_dict ? state_dict->toShortString() : "nullptr");
+
+        return out;
+    }
 };
 } // namespace cthu::interpreter

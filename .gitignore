@@ -8,3 +8,5 @@
 # build folders
 /build*
 /out
+
+/benchmark/bin

@@ -14,13 +14,13 @@ namespace fs = std::filesystem;
 namespace chrn = std::chrono;
 
 int main(int argc, char** argv) {
-    if (argc != 3) {
-        std::cerr << "./cthulhu source_code log_file\n";
+    bool STEP_DEBUG = false;
+    if (argc != 2) {
+        std::cerr << "./cthulhu source_code\n";
         return 1;
     }
 
     fs::path source_path(argv[1]);
-    fs::path log_path(argv[2]);
 
     if (!fs::exists(source_path)) {
         std::cerr << "Source path does not exist\n";
@@ -28,7 +28,6 @@ int main(int argc, char** argv) {
     }
 
     std::ifstream source_code(source_path);
-    std::ofstream log_stream(log_path);
 
     // begin measurement
     auto start_timepoint = chrn::system_clock::now();
@@ -40,27 +39,42 @@ int main(int argc, char** argv) {
 
     interpreter->addBuiltin("bv32", cthu::builtins::IBuiltin::createBuiltin_bv32());
     interpreter->addBuiltin("stck", cthu::builtins::IBuiltin::createBuiltin_stck());
-    interpreter->initExecution(std::move(program), &log_stream);
+    interpreter->initExecution(std::move(program));
 
     std::cout << "INIT\n";
-    std::cout << interpreter->getProgramState()->state_dict->toString() << '\n';
+    std::cout << interpreter->getProgramState()->state_dict->toShortString() << '\n';
     std::cout << "....\n";
 
-    while (interpreter->canContinue())
+    while (interpreter->canContinue()) {
+        if (STEP_DEBUG) {
+            std::cout << "BEFORE:\n";
+            auto state = interpreter->getProgramState();
+            std::cout << (state ? state->toString() : "nullptr") << '\n';
+        }
         interpreter->continueExecution();
 
-    auto final_state = interpreter->getFinishedStates()[0];
-
-    std::cout << "FINAL\n";
-    std::cout << final_state->state_dict->toString() << '\n';
-    std::cout << "....\n";
+        if (STEP_DEBUG) {
+            std::cout << "AFTER:\n";
+            auto state = interpreter->getProgramState();
+            std::cout << (state ? state->toString() : "nullptr") << '\n';
+            std::cout << "Press enter to continue ...\n";
+            std::getchar();
+        }
+    }
+    std::size_t final_idx = 0;
+    for (auto& final_state : interpreter->getFinishedStates()) {
+        std::cout << "FINAL " << final_idx << ":\n";
+        std::cout << final_state->state_dict->toShortString() << '\n';
+        std::cout << "....\n";
+        ++final_idx;
+    }
 
     // end measurement
     auto delta = chrn::system_clock::now() - start_timepoint;
     auto time_wip = chrn::duration_cast<chrn::milliseconds>(delta).count();
 
-    std::size_t mils = time_wip % 100;
-    time_wip /= 100;
+    std::size_t mils = time_wip % 1000;
+    time_wip /= 1000;
 
     std::size_t secs = time_wip % 60;
     time_wip /= 60;

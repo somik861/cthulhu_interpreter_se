@@ -10,7 +10,9 @@ namespace cthu::program {
 class Instruction : public virtual IStackItem {
   public:
     Instruction(std::string builtin, std::string operation, std::vector<std::string> operands, std::size_t source_line)
-        : m_builtin(std::move(builtin)), m_operation(std::move(operation)), m_operands(std::move(operands)),
+        : m_builtin(std::move(builtin)),
+          m_operation(std::move(operation)),
+          m_operands(std::move(operands)),
           m_source_line(source_line) {}
 
     const std::string& getBuiltinName() const { return m_builtin; }
@@ -28,6 +30,11 @@ class Instruction : public virtual IStackItem {
 
         return out;
     }
+    std::string toShortString(bool is_on_top /* = true */) const override {
+        if (!is_on_top)
+            return std::format("inst:{}", m_source_line);
+        return toString();
+    };
 
     std::unique_ptr<IStackItem> cloneItem() const override {
         return createUnique(m_builtin, m_operation, m_operands, m_source_line);
@@ -37,7 +44,9 @@ class Instruction : public virtual IStackItem {
                                                      std::string operation,
                                                      std::vector<std::string> operands,
                                                      std::size_t source_line) {
-        return std::make_unique<Instruction>(std::move(builtin), std::move(operation), std::move(operands),
+        return std::make_unique<Instruction>(std::move(builtin),
+                                             std::move(operation),
+                                             std::move(operands),
                                              source_line);
     }
 
