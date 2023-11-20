@@ -19,6 +19,8 @@ class Interpreter : public virtual IInterpreter {
     std::size_t getMaxThreadID() const override;
 
   private:
+    std::size_t getNextInstructionLine(program::IDict* state_dict) const;
+
     std::unique_ptr<utils::IMap<std::string, std::unique_ptr<builtins::IBuiltin>>> m_builtins =
         utils::IMap<std::string, std::unique_ptr<builtins::IBuiltin>>::createStdMap();
     std::unique_ptr<program::Program> m_program;

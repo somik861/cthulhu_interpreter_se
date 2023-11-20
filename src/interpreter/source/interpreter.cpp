@@ -28,7 +28,7 @@ void Interpreter::initExecution(std::unique_ptr<program::Program> program,
     // set init dict
     auto& state = m_thread_states.emplace_back(std::make_unique<ProgramState>());
     state->state_dict = m_program->init_dictionary->clone();
-    state->next_line_number = program::stack_utils::peekInstruction(state->state_dict->at(0))->getSourceLine();
+    state->next_line_number = getNextInstructionLine(state->state_dict.get());
 
     // add thread to the queue
     m_state_execution_queue.push_back(state.get());
@@ -57,14 +57,13 @@ void Interpreter::continueExecution() /* override */ {
         new_state->state_dict = std::move(thread);
         new_state->execution_state = ExecutionState::Running;
         new_state->last_line_number = 0;
-        new_state->next_line_number =
-            program::stack_utils::peekInstruction(new_state->state_dict->at(0))->getSourceLine();
+        new_state->next_line_number = getNextInstructionLine(new_state->state_dict.get());
         m_state_execution_queue.push_back(new_state.get());
     }
 
     if (state->execution_state == ExecutionState::Running) {
         m_state_execution_queue.push_back(state);
-        state->next_line_number = program::stack_utils::peekInstruction(state->state_dict->at(0))->getSourceLine();
+        state->next_line_number = getNextInstructionLine(state->state_dict.get());
     }
 }
 ProgramState* Interpreter::getProgramState() /* override */ { return m_state_execution_queue.front(); }
@@ -92,6 +91,12 @@ std::vector<ProgramState*> Interpreter::getFinishedStates(bool include_errors /*
     return out;
 }
 std::size_t Interpreter::getMaxThreadID() const /* override */ { return m_thread_states.size() - 1; }
+
+std::size_t Interpreter::getNextInstructionLine(program::IDict* state_dict) const {
+    if (state_dict->at(0)->empty())
+        return 0;
+    return program::stack_utils::peekInstruction(state_dict->at(0))->getSourceLine();
+}
 } // namespace cthu::interpreter::impl
 
 namespace cthu::interpreter {

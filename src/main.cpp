@@ -3,6 +3,7 @@
 #include "parser/iparser.h"
 #include "utils/iset.h"
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -10,6 +11,7 @@
 #include <string>
 
 namespace fs = std::filesystem;
+namespace chrn = std::chrono;
 
 int main(int argc, char** argv) {
     if (argc != 3) {
@@ -27,6 +29,9 @@ int main(int argc, char** argv) {
 
     std::ifstream source_code(source_path);
     std::ofstream log_stream(log_path);
+
+    // begin measurement
+    auto start_timepoint = chrn::system_clock::now();
 
     auto parser = cthu::parser::IParser::createParser();
     auto interpreter = cthu::interpreter::IInterpreter::createInterpreter();
@@ -49,4 +54,16 @@ int main(int argc, char** argv) {
     std::cout << "FINAL\n";
     std::cout << final_state->state_dict->toString() << '\n';
     std::cout << "....\n";
+
+    // end measurement
+    auto delta = chrn::system_clock::now() - start_timepoint;
+    auto time_wip = chrn::duration_cast<chrn::milliseconds>(delta).count();
+
+    std::size_t mils = time_wip % 100;
+    time_wip /= 100;
+
+    std::size_t secs = time_wip % 60;
+    time_wip /= 60;
+
+    std::cout << std::format("Took: {}m {}s {}ms\n", time_wip, secs, mils);
 }
