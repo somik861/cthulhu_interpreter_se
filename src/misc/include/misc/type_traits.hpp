@@ -85,4 +85,15 @@ struct idx_of_tuple<T, std::tuple<types_t...>> : public details::idx_of_tuple_he
 
 template <typename T, typename tuple_t>
 constexpr std::size_t idx_of_tuple_v = idx_of_tuple<T, tuple_t>::value;
+
+// is unique ptr
+template <typename T>
+struct is_unique_ptr : public std::false_type {};
+
+template <typename T, typename D>
+struct is_unique_ptr<std::unique_ptr<T, D>> : public std::true_type {};
+
+template <typename T>
+constexpr bool is_unique_ptr_v = is_unique_ptr<T>::value;
+
 } // namespace misc::traits

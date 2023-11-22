@@ -1,7 +1,7 @@
 #pragma once
 
 namespace cthu::program {
-// The first 3 bits are ignored, so the Stack can do its fast optimisations;
+// The bottom-most 3 bits are ignored, so the Stack can do its fast optimisations;
 class InstrFast {
   public:
     uint64_t value = 0;
