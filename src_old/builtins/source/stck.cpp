@@ -8,11 +8,11 @@
 #define _CHECK_OP_COUNT(n) CHECK_OPERANDS_COUNT("stck", n)
 
 namespace cthu::builtins::impl {
-interpreter::ExecutionState
-Stck::executeOperation(const std::string& operation,
-                       const std::vector<std::string>& operands,
-                       program::IDict* state_dict,
-                       std::vector<std::unique_ptr<program::IDict>>& new_threads) /*  override */ {
+interpreter::ExecutionState Stck::executeOperation(
+    const std::string& operation,
+    const std::vector<std::string>& operands,
+    program::IDict* state_dict,
+    std::vector<std::unique_ptr<program::IDict>>& new_threads) /*  override */ {
 
     if (operation == "split") {
         _CHECK_OP_COUNT(2);
