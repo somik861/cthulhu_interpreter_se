@@ -42,12 +42,19 @@ struct to_owning_tuple<std::tuple<types_t...>> {
 template <typename tuple_t>
 using to_owning_tuple_t = to_owning_tuple<tuple_t>::type;
 
-// to plain types
+// to plain type
+template <typename T>
+struct to_plain_type : public std::remove_pointer<T> {};
+
+template <typename T>
+using to_plain_type_t = to_plain_type<T>::type;
+
+// to plain tuple
 template <typename tuple_t>
 struct to_plain_tuple;
 template <typename... types_t>
 struct to_plain_tuple<std::tuple<types_t...>> {
-    using type = std::tuple<std::remove_pointer_t<types_t>...>;
+    using type = std::tuple<to_plain_type_t<types_t>...>;
 };
 template <typename tuple_t>
 using to_plain_tuple_t = to_plain_tuple<tuple_t>::type;

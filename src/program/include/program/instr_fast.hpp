@@ -5,6 +5,9 @@ namespace cthu::program {
 class InstrFast {
   public:
     uint64_t value = 0;
+
+    std::string toShortString(bool is_on_top = true) const { return ""; };
+    std::string toJson(std::size_t indent = 0) const { return ""; }
 };
 
 // make sure that sizeof(InstrFast) is 8

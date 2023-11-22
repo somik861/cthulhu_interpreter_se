@@ -6,6 +6,7 @@
 #include "program/instr_fast.hpp"
 #include "program/word.hpp"
 
+#include <cassert>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -104,7 +105,7 @@ class Stack {
     constexpr bool empty() const noexcept { return m_storage.empty(); }
     constexpr void clear() {
         while (!empty())
-            PopAndDeleteTop<>::run(this);
+            popAndDeleteTop();
     }
     constexpr std::string toShortString(bool is_on_top = true) const { return ""; }
     constexpr std::string toJson(std::size_t indent = 0) const { return ""; }
@@ -138,6 +139,7 @@ class Stack {
         using return_t =
             misc::traits::type_of_tuple_t<misc::traits::idx_of_tuple_v<T, m_plain_types>, m_supported_types>;
 
+        /*
         if constexpr (std::is_pointer_v<return_t> || std::is_same_v<return_t, InstrFast>) {
             uint64_t untagged = item & 0b000;
             return *reinterpret_cast<return_t*>(&untagged);
@@ -145,6 +147,8 @@ class Stack {
             uint64_t shifted = item >> 3;
             return *reinterpret_cast<return_t*>(&shifted);
         }
+        */
+        return return_t{};
     }
 
     template <typename T>
@@ -161,41 +165,39 @@ class Stack {
         return before_tag | misc::traits::idx_of_tuple_v<T, m_supported_types>;
     }
 
-    //  pop and delete item on top
+    // apply function on item with correct type
     template <typename tuple_t = m_plain_types>
-    struct PopAndDeleteTop {
-        constexpr static void run(Stack*) {}
+    struct Apply {
+        template <typename fun_t>
+        static constexpr auto run(uint64_t item, fun_t fun) {
+            // this will never happen
+            assert(false);
+            return fun(Word(0));
+        }
     };
-    template <typename first_t, typename... types_t>
-    struct PopAndDeleteTop<std::tuple<first_t, types_t...>> {
-        constexpr static void run(Stack* s) {
-            if (s->checkTop<first_t>())
-                s->pop<first_t>();
+    template <typename first_t, typename... rest_t>
+    struct Apply<std::tuple<first_t, rest_t...>> {
+        template <typename fun_t>
+        static constexpr auto run(uint64_t item, fun_t fun) {
+            if (checkItem<first_t>(item))
+                return fun(decryptItem<first_t>(item));
             else
-                PopAndDeleteTop<std::tuple<types_t...>>::run(s);
+                return Apply<std::tuple<rest_t...>>::run(item, fun);
         }
     };
 
-    //  clone item and respect its type
-    template <typename tuple_t = m_plain_types>
-    struct FindTypeAndClone {
-        constexpr static uint64_t run(uint64_t item) noexcept { return 0; }
-    };
-    template <typename first_t, typename... types_t>
-    struct FindTypeAndClone<std::tuple<first_t, types_t...>> {
-        constexpr static uint64_t run(uint64_t item) noexcept {
-            if (checkItem<first_t>(item))
-                return cloneItem<first_t>(item);
-            return FindTypeAndClone<std::tuple<types_t...>>::run(item);
-        }
-    };
+    constexpr void popAndDeleteTop() {
+        Apply<>::run(m_storage.front(), [this](auto item) { pop<misc::traits::to_plain_type_t<decltype(item)>>(); });
+    }
 
     // clone storage
     std::vector<uint64_t> cloneStorage() const {
         std::vector<uint64_t> out;
         out.reserve(m_storage.size());
         for (const auto& item : m_storage)
-            out.emplace_back(FindTypeAndClone<>::run(item));
+            out.emplace_back(Apply<>::run(item, [item](auto x) -> uint64_t {
+                return cloneItem<misc::traits::to_plain_type_t<decltype(x)>>(item);
+            }));
 
         return out;
     }
