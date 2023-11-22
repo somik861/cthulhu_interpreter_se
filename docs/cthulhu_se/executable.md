@@ -24,3 +24,7 @@ Executetes cthulhu_se threads as a real threads. This may increase performance o
 * `--imode=MODE` sets interpreter mode (default: normal)
 * `--max_threads=N` limits max number of threads in parallel mode (default: your CPU core count (including HT)).
 * `--read_result=N` instead of printing final state, read a number from stack **N** and print it as a result.
+* `--debug_json` print states in json-compatible format in debug mode.
+
+# Text output
+If `--read_result` is not specified, the output is written in json-compatible format.
