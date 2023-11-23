@@ -37,4 +37,6 @@ class SafeStack : public Stack {
             throw std::runtime_error(fun_name + " called with invalid type specifier");
     }
 };
+
+static_assert(sizeof(SafeStack) == sizeof(Stack), "The safe stack has something that it should not have.");
 } // namespace cthu::program

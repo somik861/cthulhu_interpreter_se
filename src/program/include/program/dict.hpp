@@ -4,6 +4,7 @@
 #include "program/stack.hpp"
 #include "program/word.hpp"
 
+#include <algorithm>
 #include <format>
 #include <memory>
 #include <ostream>
@@ -13,12 +14,31 @@
 namespace cthu::program {
 class Dict {
   public:
-    // TODO implement operators
     constexpr Dict() noexcept = default;
-    constexpr Dict(const Dict&){};
-    constexpr Dict(Dict&&) noexcept {};
-    constexpr Dict& operator=(const Dict&) { return *this; }
-    constexpr Dict& operator=(Dict&&) noexcept { return *this; };
+    constexpr Dict(const Dict& o) {
+        m_storage.reserve(o.m_storage.size());
+        for (const auto& elem : o.m_storage)
+            if (elem == nullptr)
+                m_storage.emplace_back();
+            else
+                m_storage.emplace_back(new Stack(*elem));
+    };
+    constexpr Dict(Dict&&) noexcept = default;
+    constexpr Dict& operator=(const Dict& o) {
+        if (m_storage.size() < o.m_storage.size())
+            m_storage.resize(o.m_storage.size());
+
+        std::transform(o.m_storage.begin(),
+                       o.m_storage.end(),
+                       m_storage.begin(),
+                       [](const auto& elem) -> std::unique_ptr<Stack> {
+                           if (elem == nullptr)
+                               return nullptr;
+                           return std::make_unique<Stack>(*elem);
+                       });
+        return *this;
+    }
+    constexpr Dict& operator=(Dict&&) noexcept = default;
     ~Dict() noexcept = default;
 
     constexpr bool contains(Word key) const noexcept {
