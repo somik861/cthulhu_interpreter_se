@@ -1,17 +1,19 @@
 #pragma once
 
 #include "misc/type_traits.hpp"
-#include "program/dict.hpp"
 #include "program/instr.hpp"
 #include "program/instr_fast.hpp"
 #include "program/word.hpp"
 
 #include <cassert>
+#include <format>
 #include <string>
 #include <tuple>
 #include <vector>
 
 namespace cthu::program {
+class Dict;
+
 namespace details {
 // reject all by default
 template <typename T>
@@ -33,7 +35,7 @@ struct is_supported_in_stack<T> : public std::true_type {};
 } // namespace details
 
 class Stack {
-  private:
+  protected:
     // specify supported types below
     using m_supported_types = std::tuple<Stack*, Dict*, Instr*, Word, InstrFast>;
 
@@ -84,7 +86,7 @@ class Stack {
 
     template <typename T>
         requires misc::traits::is_any_of_tuple_v<T, m_owning_types>
-    constexpr void push(T item) {
+    constexpr void push(T&& item) {
         uint64_t encrypted;
 
         if constexpr (misc::traits::is_unique_ptr_v<T>)
@@ -107,10 +109,10 @@ class Stack {
         while (!empty())
             popAndDeleteTop();
     }
-    constexpr std::string toShortString(bool is_on_top = true) const { return ""; }
-    constexpr std::string toJson(std::size_t indent = 0) const { return ""; }
+    std::string toShortString(bool is_on_top = true) const;
+    std::string toJson(std::size_t indent = 0) const;
 
-  private:
+  protected:
     constexpr Stack(std::vector<uint64_t> storage) noexcept
         : m_storage(std::move(storage)) {}
 
@@ -139,7 +141,6 @@ class Stack {
         using return_t =
             misc::traits::type_of_tuple_t<misc::traits::idx_of_tuple_v<T, m_plain_types>, m_supported_types>;
 
-        /*
         if constexpr (std::is_pointer_v<return_t> || std::is_same_v<return_t, InstrFast>) {
             uint64_t untagged = item & 0b000;
             return *reinterpret_cast<return_t*>(&untagged);
@@ -147,8 +148,6 @@ class Stack {
             uint64_t shifted = item >> 3;
             return *reinterpret_cast<return_t*>(&shifted);
         }
-        */
-        return return_t{};
     }
 
     template <typename T>
@@ -159,7 +158,7 @@ class Stack {
         if constexpr (std::is_pointer_v<T> || std::is_same_v<T, InstrFast>)
             before_tag = *reinterpret_cast<uint64_t*>(&item);
         else
-            before_tag = ((*reinterpret_cast<uint64_t*>(&item)) & (uint64_t(-1) >> (64 - sizeof(T) * 8))) << 3;
+            before_tag = ((*reinterpret_cast<uint64_t*>(&item)) /* & (uint64_t(-1) >> (64 - sizeof(T) * 8)) */) << 3;
 
         // place tag at the bottom 3 bits
         return before_tag | misc::traits::idx_of_tuple_v<T, m_supported_types>;
@@ -205,3 +204,8 @@ class Stack {
     std::vector<uint64_t> m_storage;
 };
 } // namespace cthu::program
+
+inline std::ostream& operator<<(std::ostream& stream, const cthu::program::Stack& stack) {
+    stream << stack.toShortString();
+    return stream;
+}
