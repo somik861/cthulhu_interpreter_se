@@ -7,6 +7,10 @@ namespace cthu::program {
 
 class Word {
   public:
+    Word() = default;
+    Word(uint32_t value)
+        : value(value) {}
+
     uint32_t value;
     std::string toShortString(bool is_on_top = true) const { return std::to_string(value); }
     std::string toJson(std::size_t indent = 0) const {
