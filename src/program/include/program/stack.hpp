@@ -1,8 +1,8 @@
 #pragma once
 
 #include "misc/type_traits.hpp"
-#include "program/instruction.hpp"
 #include "program/fast_instruction.hpp"
+#include "program/instruction.hpp"
 #include "program/word.hpp"
 
 #include <cassert>
@@ -86,7 +86,7 @@ class Stack {
 
     template <typename T>
         requires misc::traits::is_any_of_tuple_v<T, m_owning_types>
-    constexpr void push(T&& item) {
+    constexpr void push(T item) {
         uint64_t encrypted;
 
         if constexpr (misc::traits::is_unique_ptr_v<T>)

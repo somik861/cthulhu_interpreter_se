@@ -12,7 +12,7 @@ class SafeDict;
 namespace cthu::program::details {
 
 template <typename item_t>
-constexpr auto toSafe(item_t&& item) {
+constexpr auto toSafe(item_t item) {
     if constexpr (std::is_same_v<item_t, Stack*>)
         return reinterpret_cast<SafeStack*>(item);
     else if constexpr (std::is_same_v<item_t, std::unique_ptr<Stack>>)
@@ -25,7 +25,7 @@ constexpr auto toSafe(item_t&& item) {
         return item;
 }
 template <typename item_t>
-constexpr auto fromSafe(item_t&& item) {
+constexpr auto fromSafe(item_t item) {
     if constexpr (std::is_same_v<item_t, SafeStack*>)
         return reinterpret_cast<Stack*>(item);
     else if constexpr (std::is_same_v<item_t, std::unique_ptr<SafeStack>>)

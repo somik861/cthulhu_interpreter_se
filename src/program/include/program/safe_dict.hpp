@@ -13,7 +13,7 @@ class SafeDict : public Dict {
     void set(Word key, std::unique_ptr<SafeStack>&& stack) {
         if (m_storage.size() <= key.value)
             m_storage.resize((std::size_t(key.value) + 1) * 2);
-        m_storage[key.value] = fromSafe(std::move(stack));
+        m_storage[key.value] = details::fromSafe(std::move(stack));
     }
 };
 

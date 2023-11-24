@@ -11,5 +11,7 @@ endmacro()
 
 add_project_module("${CMAKE_SOURCE_DIR}/src/program")
 add_project_module("${CMAKE_SOURCE_DIR}/src/misc")
+add_project_module("${CMAKE_SOURCE_DIR}/src/domains")
+add_project_module("${CMAKE_SOURCE_DIR}/src/interpreter")
 
 add_executable(cthulhu_se src/main.cpp ${SOURCE_FILES})
