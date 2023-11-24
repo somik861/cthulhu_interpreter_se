@@ -39,7 +39,7 @@ class Dict {
         return *this;
     }
     constexpr Dict& operator=(Dict&&) noexcept = default;
-    ~Dict() noexcept = default;
+    constexpr ~Dict() noexcept = default;
 
     constexpr bool contains(Word key) const noexcept {
         return key.value < m_storage.size() && m_storage[key.value] != nullptr;

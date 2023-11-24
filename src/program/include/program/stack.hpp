@@ -1,8 +1,8 @@
 #pragma once
 
 #include "misc/type_traits.hpp"
-#include "program/instr.hpp"
-#include "program/instr_fast.hpp"
+#include "program/instruction.hpp"
+#include "program/fast_instruction.hpp"
 #include "program/word.hpp"
 
 #include <cassert>
@@ -23,9 +23,9 @@ struct is_supported_in_stack : public std::false_type {};
 template <typename ptr_t>
 struct is_supported_in_stack<ptr_t*> : public std::true_type {};
 
-// allow InstrFast
+// allow FastInstruction
 template <>
-struct is_supported_in_stack<InstrFast> : public std::true_type {};
+struct is_supported_in_stack<FastInstruction> : public std::true_type {};
 
 // allow sizeof(elem) <= 7
 template <typename T>
@@ -37,16 +37,16 @@ struct is_supported_in_stack<T> : public std::true_type {};
 class Stack {
   protected:
     // specify supported types below
-    using m_supported_types = std::tuple<Stack*, Dict*, Instr*, Word, InstrFast>;
+    using m_supported_types = std::tuple<Stack*, Dict*, Instruction*, Word, FastInstruction>;
 
     // automatic tests and helper usings
     using m_plain_types = misc::traits::to_plain_tuple_t<m_supported_types>;
     using m_owning_types = misc::traits::to_owning_tuple_t<m_supported_types>;
     // check size(m_supported_types) < 8
     static_assert(std::tuple_size_v<m_supported_types> < 8, "There is too much types for the stack to optimize");
-    // check that each element is either a pointer, InstrFast, or sizeof(elem) <= 7
+    // check that each element is either a pointer, FastInstruction, or sizeof(elem) <= 7
     static_assert(misc::traits::all_of_tuple_v<m_supported_types, details::is_supported_in_stack>,
-                  "Some type is not a pointer/InstrFast and its size is larger than 7");
+                  "Some type is not a pointer/FastInstruction and its size is larger than 7");
     // check that pointers are 64 bits (yea, we do not support 32bit architectures)
     static_assert(sizeof(void*) == 8, "non 64-bit architectures are not supported");
 
@@ -65,7 +65,7 @@ class Stack {
         m_storage = std::move(o.m_storage);
         return *this;
     };
-    ~Stack() noexcept { clear(); }
+    constexpr ~Stack() noexcept { clear(); }
 
     template <typename T>
         requires misc::traits::is_any_of_tuple_v<T, m_plain_types>
@@ -141,7 +141,7 @@ class Stack {
         using return_t =
             misc::traits::type_of_tuple_t<misc::traits::idx_of_tuple_v<T, m_plain_types>, m_supported_types>;
 
-        if constexpr (std::is_pointer_v<return_t> || std::is_same_v<return_t, InstrFast>) {
+        if constexpr (std::is_pointer_v<return_t> || std::is_same_v<return_t, FastInstruction>) {
             uint64_t untagged = item & 0b000;
             return *reinterpret_cast<return_t*>(&untagged);
         } else {
@@ -155,7 +155,7 @@ class Stack {
     constexpr static uint64_t encryptItem(T item) noexcept {
         uint64_t before_tag;
 
-        if constexpr (std::is_pointer_v<T> || std::is_same_v<T, InstrFast>)
+        if constexpr (std::is_pointer_v<T> || std::is_same_v<T, FastInstruction>)
             before_tag = *reinterpret_cast<uint64_t*>(&item);
         else
             before_tag = ((*reinterpret_cast<uint64_t*>(&item)) /* & (uint64_t(-1) >> (64 - sizeof(T) * 8)) */) << 3;

@@ -5,9 +5,9 @@
 #include <vector>
 
 namespace cthu::program {
-class Instr {
+class Instruction {
   public:
-    constexpr Instr(std::string domain,
+    constexpr Instruction(std::string domain,
                     std::string operation,
                     std::vector<std::string> operands,
                     std::size_t source_line) noexcept
@@ -52,7 +52,7 @@ class Instr {
 };
 } // namespace cthu::program
 
-inline std::ostream& operator<<(std::ostream& stream, const cthu::program::Instr& instr) {
+inline std::ostream& operator<<(std::ostream& stream, const cthu::program::Instruction& instr) {
     stream << instr.toShortString();
     return stream;
 }
