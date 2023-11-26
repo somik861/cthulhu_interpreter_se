@@ -25,14 +25,14 @@ class SafeStack : public Stack {
     template <typename T>
     constexpr void push(T elem) {
         if constexpr (std::is_pointer_v<T>)
-            if (elem & 0b111 != 0)
+            if ((elem & 0b111) != 0)
                 throw std::runtime_error("3 low bits of pointer are not zeroes");
 
         if constexpr (std::is_same_v<T, FastInstruction>)
-            if (elem.value & 0b111 != 0)
+            if ((elem.value & 0b111) != 0)
                 throw std::runtime_error("3 low bits of instruction are not zeroes");
 
-        Stack::push(details::fromSafe(elem));
+        Stack::push(details::fromSafe(std::move(elem)));
     };
 
   protected:

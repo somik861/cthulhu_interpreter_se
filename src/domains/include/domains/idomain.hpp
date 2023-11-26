@@ -2,7 +2,6 @@
 
 #include "interpreter/thread_state.hpp"
 #include "program/dict.hpp"
-#include "program/fast_instruction.hpp"
 #include "program/instruction.hpp"
 #include "program/safe_dict.hpp"
 
@@ -12,41 +11,44 @@ namespace cthu::domains {
 class IDomain {
   public:
     /**
-     * @brief Call instruction of given domain
+     * @brief Call operation of given domain
      *
      * Throws std::runtime_error with human-friendly message when something illegal happens.
      *
-     * @param[in] instruction        instruction specification
+     * @param[in] operation          operation to execute
+     * @param[in] operands           operands
      * @param[in,out] state          current program state
      * @param[out] new_threads       new threads that should be created (vector will always be empty at call)
      * @return                       new thread state
      */
-    constexpr virtual interpreter::ThreadState call(
-        const program::Instruction& instruction,
-        program::SafeDict& state,
-        std::vector<std::unique_ptr<program::SafeDict>>& new_threads) const = 0;
+    constexpr virtual interpreter::ThreadState call(const std::string& operation,
+                                                    const std::vector<std::string>& operands,
+                                                    program::SafeDict& state,
+                                                    std::vector<program::SafeDict>& new_threads) const = 0;
 
     /**
-     * @brief Call instruction of given domain
+     * @brief Call operation of given domain
      *
-     * @param[in] instruction        instruction specification
+     * @param[in] operation_code     code of the operation
      * @param[in,out] state          current program state
      * @param[out] new_threads       new threads that should be created (vector will always be empty at call)
      * @return                       new thread state
      */
-    constexpr virtual interpreter::ThreadState call(const program::FastInstruction& instruction,
+    constexpr virtual interpreter::ThreadState call(uint32_t operation_code,
                                                     program::Dict& state,
-                                                    std::vector<std::unique_ptr<program::Dict>>& new_threads) const = 0;
+                                                    std::vector<program::Dict>& new_threads) const = 0;
 
     /**
-     * @brief Compile instruction to fast instruction
+     * @brief Compile operation with arguments to operation code
      *
-     * Throws std::invalid_argument if instruction can not be compiled
+     * Throws std::invalid_argument if operation can not be compiled
      *
-     * @param[in] instruction            instruction to compile
-     * @return                           compiled instruction
+     * @param[in] operation            operation
+     * @param[in] operands             operands
+     * @return                         operation code
      */
-    constexpr virtual program::FastInstruction compile(const program::Instruction& instruction) const = 0;
+    constexpr virtual uint32_t compile(const std::string& operation,
+                                       const std::vector<std::string>& operands) const = 0;
 
     constexpr virtual ~IDomain() noexcept = default;
 };
