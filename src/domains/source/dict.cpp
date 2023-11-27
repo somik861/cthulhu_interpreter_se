@@ -11,7 +11,7 @@ template <typename dict_t>
 constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint8_t, 1> args) {
     switch (operation) {
     case Dict::Operation::drop:
-        state.at(args[0])->pop<program::Dict>();
+        state.at(args[0])->template pop<program::Dict>();
         return;
     case Dict::Operation::zero:
         state.at(args[0])->push(std::make_unique<dict_t>());
@@ -23,11 +23,11 @@ template <typename dict_t>
 constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint8_t, 2> args) {
     switch (operation) {
     case Dict::Operation::move:
-        state.at(args[1])->push(state.at(args[0])->pop<program::Dict>());
+        state.at(args[1])->push(state.at(args[0])->template pop<program::Dict>());
         return;
     case Dict::Operation::swap: {
-        auto fst = state.at(args[0])->pop<program::Dict>();
-        auto snd = state.at(args[1])->pop<program::Dict>();
+        auto fst = state.at(args[0])->template pop<program::Dict>();
+        auto snd = state.at(args[1])->template pop<program::Dict>();
         state.at(args[0])->push(std::move(snd));
         state.at(args[1])->push(std::move(fst));
         return;
@@ -39,7 +39,7 @@ template <typename dict_t>
 constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint8_t, 3> args) {
     switch (operation) {
     case Dict::Operation::dup: {
-        auto elem = state.at(args[0])->pop<program::Dict>();
+        auto elem = state.at(args[0])->template pop<program::Dict>();
         state.at(args[1])->push(std::unique_ptr<dict_t>(new dict_t(*elem)));
         state.at(args[2])->push(std::move(elem));
         return;
@@ -52,17 +52,17 @@ constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint
     switch (operation) {
     case Dict::Operation::fetch: {
         auto stack = state.pop(args[0]);
-        auto dict = state.at(args[1])->pop<program::Dict>();
-        auto key = state.at(args[2])->pop<program::Word>();
-        state.set(args[0], dict->pop(key));
+        auto dict = state.at(args[1])->template pop<program::Dict>();
+        auto key = state.at(args[2])->template pop<program::Word>();
+        state.set(args[0], dict->template pop(key));
         state.at(args[3])->push(std::move(dict));
         state.at(args[4])->push(std::move(stack));
         return;
     }
     case Dict::Operation::store: {
         auto stack = state.pop(args[0]);
-        auto dict = state.at(args[1])->pop<program::Dict>();
-        auto key = state.at(args[2])->pop<program::Word>();
+        auto dict = state.at(args[1])->template pop<program::Dict>();
+        auto key = state.at(args[2])->template pop<program::Word>();
         auto new_stack = state.pop(args[3]);
         dict->set(key, std::move(stack));
         state.set(args[0], std::move(new_stack));

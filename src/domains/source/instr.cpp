@@ -24,7 +24,7 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 1> args)
                                              cthu::program::FastInstruction>;
     switch (op) {
     case Operation::drop:
-        state.at(args[0])->pop<instruction_t>();
+        state.at(args[0])->template pop<instruction_t>();
         return;
     case Operation::zero:
         if constexpr (std::is_same_v<instruction_t, cthu::program::Instruction>)
@@ -42,11 +42,11 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 2> args)
                                              cthu::program::FastInstruction>;
     switch (op) {
     case Operation::move:
-        state.at(args[1])->push(state.at(args[0])->pop<instruction_t>());
+        state.at(args[1])->push(state.at(args[0])->template pop<instruction_t>());
         return;
     case Operation::swap: {
-        auto fst = state.at(args[0])->pop<instruction_t>();
-        auto snd = state.at(args[1])->pop<instruction_t>();
+        auto fst = state.at(args[0])->template pop<instruction_t>();
+        auto snd = state.at(args[1])->template pop<instruction_t>();
         state.at(args[0])->push(std::move(snd));
         state.at(args[1])->push(std::move(fst));
         return;
@@ -61,7 +61,7 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 3> args)
                                              cthu::program::FastInstruction>;
     switch (op) {
     case Operation::dup: {
-        auto item = state.at(args[0])->pop<instruction_t>();
+        auto item = state.at(args[0])->template pop<instruction_t>();
         if constexpr (std::is_same_v<instruction_t, cthu::program::Instruction>) {
             state.at(args[1])->push(std::unique_ptr<instruction_t>(new instruction_t(*item)));
             state.at(args[2])->push(std::move(item));

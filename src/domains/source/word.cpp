@@ -12,16 +12,16 @@ constexpr interpreter::ThreadState execute(dict_t& state,
                                            std::vector<dict_t>& new_threads) {
     switch (operation) {
     case Word::Operation::drop:
-        state.at(args[0])->pop<program::Word>();
+        state.at(args[0])->template pop<program::Word>();
         return interpreter::ThreadState::Running;
     case Word::Operation::zero:
         state.at(args[0])->push(program::Word(0));
         return interpreter::ThreadState::Running;
     case Word::Operation::guard_zero:
-        return (state.at(args[0])->pop<program::Word>().value == 0) ? interpreter::ThreadState::Running
+        return (state.at(args[0])->template pop<program::Word>().value == 0) ? interpreter::ThreadState::Running
                                                                     : interpreter::ThreadState::Killed;
     case Word::Operation::guard_nonzero:
-        return (state.at(args[0])->pop<program::Word>().value != 0) ? interpreter::ThreadState::Running
+        return (state.at(args[0])->template pop<program::Word>().value != 0) ? interpreter::ThreadState::Running
                                                                     : interpreter::ThreadState::Killed;
     }
 
@@ -32,11 +32,11 @@ template <typename dict_t>
 constexpr void execute(dict_t& state, Word::Operation operation, std::array<uint8_t, 2> args) {
     switch (operation) {
     case Word::Operation::move:
-        state.at(args[1])->push(state.at(args[0])->pop<program::Word>());
+        state.at(args[1])->push(state.at(args[0])->template pop<program::Word>());
         return;
     case Word::Operation::swap: {
-        auto fst = state.at(args[0])->pop<program::Word>();
-        auto snd = state.at(args[1])->pop<program::Word>();
+        auto fst = state.at(args[0])->template pop<program::Word>();
+        auto snd = state.at(args[1])->template pop<program::Word>();
         state.at(args[0])->push(snd);
         state.at(args[1])->push(fst);
         return;
@@ -51,7 +51,7 @@ constexpr void execute(dict_t& state, Word::Operation operation, std::array<uint
 
     switch (operation) {
     case Word::Operation::dup: {
-        auto elem = state.at(args[0])->pop<word_t>();
+        auto elem = state.at(args[0])->template pop<word_t>();
         state.at(args[1])->push(elem);
         state.at(args[2])->push(elem);
         return;

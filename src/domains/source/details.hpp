@@ -117,15 +117,15 @@ inline void unsupportedArity(std::size_t arity, const std::string& domain) {
 namespace ops_templ {
 template <typename val_t, typename dict_t, typename fun_t>
 constexpr void compute_unary(dict_t& state, std::array<uint8_t, 2> args, fun_t fun) {
-    auto arg = state.at(args[0])->pop<val_t>();
+    auto arg = state.at(args[0])->template pop<val_t>();
 
     state.at(args[1])->push(fun(arg));
 }
 
 template <typename val_t, typename dict_t, typename fun_t>
 constexpr void compute_binary(dict_t& state, std::array<uint8_t, 3> args, fun_t fun) {
-    auto lhs = state.at(args[0])->pop<val_t>();
-    auto rhs = state.at(args[1])->pop<val_t>();
+    auto lhs = state.at(args[0])->template pop<val_t>();
+    auto rhs = state.at(args[1])->template pop<val_t>();
 
     state.at(args[2])->push(fun(lhs, rhs));
 }

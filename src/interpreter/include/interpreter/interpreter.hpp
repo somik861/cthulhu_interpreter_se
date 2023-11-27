@@ -16,6 +16,7 @@
 #include <memory>
 #include <set>
 #include <type_traits>
+#include <atomic>
 
 namespace cthu::interpreter {
 namespace details {
@@ -94,7 +95,7 @@ class Interpreter {
             }
             if constexpr (!fast_mode) {
                 // slow execution
-                auto instruction = instruction_stack->pop<program::Instruction>();
+                auto instruction = instruction_stack->template pop<program::Instruction>();
                 auto& domain_ptr = m_domains.at(m_domain_map.at(instruction->domain));
                 program_state->thread_state =
                     domain_ptr->call(instruction->operation, instruction->operands, program_state->state, new_threads);
@@ -102,7 +103,7 @@ class Interpreter {
                 program_state->next_line_number = details::extractNextInstructionLine(program_state->state);
             } else {
                 // fast execution
-                auto instruction = instruction_stack->pop<program::FastInstruction>();
+                auto instruction = instruction_stack->template pop<program::FastInstruction>();
                 auto& domain_ptr = m_domains[instruction.domain_code];
                 program_state->thread_state =
                     domain_ptr->call(instruction.operation_code, program_state->state, new_threads);

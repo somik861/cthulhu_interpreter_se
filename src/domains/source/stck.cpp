@@ -12,13 +12,13 @@ constexpr void execute(dict_t& state,
     using stack_t = std::remove_reference_t<decltype(*state.at(0))>;
     switch (operation) {
     case Stck::Operation::drop:
-        state.at(args[0])->pop<program::Stack>();
+        state.at(args[0])->template pop<program::Stack>();
         return;
     case Stck::Operation::zero:
         state.at(args[0])->push(std::make_unique<stack_t>());
         return;
     case Stck::Operation::exec: {
-        auto instr_stack = state.at(args[0])->pop<program::Stack>();
+        auto instr_stack = state.at(args[0])->template pop<program::Stack>();
         auto temp_stack = state.pop(0);
         auto cpy = state;
 
@@ -35,11 +35,11 @@ template <typename dict_t>
 constexpr void execute(dict_t& state, Stck::Operation operation, std::array<uint8_t, 2> args) {
     switch (operation) {
     case Stck::Operation::move:
-        state.at(args[1])->push(state.at(args[0])->pop<program::Stack>());
+        state.at(args[1])->push(state.at(args[0])->template pop<program::Stack>());
         return;
     case Stck::Operation::swap:
-        auto fst = state.at(args[0])->pop<program::Stack>();
-        auto snd = state.at(args[1])->pop<program::Stack>();
+        auto fst = state.at(args[0])->template pop<program::Stack>();
+        auto snd = state.at(args[1])->template pop<program::Stack>();
         state.at(args[0])->push(std::move(snd));
         state.at(args[1])->push(std::move(fst));
         return;
@@ -52,14 +52,14 @@ constexpr void execute(dict_t& state, Stck::Operation operation, std::array<uint
     using stack_t = std::remove_reference_t<decltype(*state.at(0))>;
     switch (operation) {
     case Stck::Operation::dup: {
-        auto elem = state.at(args[0])->pop<program::Stack>();
+        auto elem = state.at(args[0])->template pop<program::Stack>();
         state.at(args[1])->push(std::unique_ptr<stack_t>(new stack_t(*elem)));
         state.at(args[2])->push(std::move(elem));
     }
         return;
     case Stck::Operation::pivot: {
         auto stack = state.pop(args[0]);
-        auto new_stack = state.at(args[1])->pop<program::Stack>();
+        auto new_stack = state.at(args[1])->template pop<program::Stack>();
         state.set(args[0], std::move(new_stack));
         state.at(args[2])->push(std::move(stack));
         return;

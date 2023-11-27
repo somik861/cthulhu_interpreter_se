@@ -190,7 +190,7 @@ class Stack {
     }
 
     // clone storage
-    std::vector<uint64_t> cloneStorage() const {
+    constexpr std::vector<uint64_t> cloneStorage() const {
         std::vector<uint64_t> out;
         out.reserve(m_storage.size());
         for (const auto& item : m_storage)
