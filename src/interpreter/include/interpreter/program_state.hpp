@@ -18,12 +18,16 @@ class ProgramState {
         out += std::format("Thread ID: {}\n", thread_id);
         out += std::format("Running: {}\n", thread_state == ThreadState::Running);
 
-        /*
-        auto instruction_stack = state_dict->at(0);
-        if (!instruction_stack->empty())
-            out += std::format("Next execution: {}\n",
-                               program::stack_utils::peekInstruction(instruction_stack)->toString());
-        */
+        auto instruction_stack = state.at(0);
+        if (!instruction_stack->empty()) {
+            std::string next_instr;
+            if constexpr (std::is_same_v<dict_t, program::SafeDict>)
+                next_instr = instruction_stack->peek<program::Instruction>()->toShortString();
+            else
+                next_instr = instruction_stack->peek<program::FastInstruction>().toShortString();
+            out += std::format("Next execution: {}\n", next_instr);
+        }
+
         out += std::format("State: {}", state.toShortString());
 
         return out;
