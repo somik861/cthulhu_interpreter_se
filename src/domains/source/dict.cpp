@@ -25,12 +25,13 @@ constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint
     case Dict::Operation::move:
         state.at(args[1])->push(state.at(args[0])->pop<program::Dict>());
         return;
-    case Dict::Operation::swap:
+    case Dict::Operation::swap: {
         auto fst = state.at(args[0])->pop<program::Dict>();
         auto snd = state.at(args[1])->pop<program::Dict>();
         state.at(args[0])->push(std::move(snd));
         state.at(args[1])->push(std::move(fst));
         return;
+    }
     }
     details::throwers::invalidOperationForArity(operation, 2);
 }
