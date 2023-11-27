@@ -38,11 +38,12 @@ constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint
 template <typename dict_t>
 constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint8_t, 3> args) {
     switch (operation) {
-    case Dict::Operation::dup:
+    case Dict::Operation::dup: {
         auto elem = state.at(args[0])->pop<program::Dict>();
         state.at(args[1])->push(std::unique_ptr<dict_t>(new dict_t(*elem)));
         state.at(args[2])->push(std::move(elem));
         return;
+    }
     }
     details::throwers::invalidOperationForArity(operation, 3);
 }

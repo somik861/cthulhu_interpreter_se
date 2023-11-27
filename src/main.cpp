@@ -1,3 +1,4 @@
+#include "domains/builtins/bv32.hpp"
 #include "domains/dict.hpp"
 #include "domains/instr.hpp"
 #include "domains/stck.hpp"
