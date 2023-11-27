@@ -6,3 +6,4 @@ Operation groups:
 * Equitable
 * Orderable
 * Guardable
+* Logical

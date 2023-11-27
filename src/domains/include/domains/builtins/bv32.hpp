@@ -27,6 +27,8 @@ class Bv32 : public IDomain {
         xor_,
         or_,
         neg,
+        land,
+        lor,
         guard_zero,
         guard_nonzero
     };

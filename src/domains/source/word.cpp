@@ -111,6 +111,16 @@ constexpr void execute(dict_t& state, Word::Operation operation, std::array<uint
             return word_t(lhs.value >= rhs.value);
         });
         return;
+    case Word::Operation::land:
+        details::ops_templ::compute_binary<word_t>(state, args, [](auto lhs, auto rhs) {
+            return word_t(lhs.value && rhs.value);
+        });
+        return;
+    case Word::Operation::lor:
+        details::ops_templ::compute_binary<word_t>(state, args, [](auto lhs, auto rhs) {
+            return word_t(lhs.value || rhs.value);
+        });
+        return;
     }
 
     details::throwers::invalidOperationForArity(operation, 3);
@@ -204,6 +214,10 @@ constexpr /* static */ Word::Operation Word::operationFromName(const std::string
         return Operation::gt;
     if (name == "ge")
         return Operation::ge;
+    if (name == "land")
+        return Operation::land;
+    if (name == "lor")
+        return Operation::lor;
     if (name == "guard_zero")
         return Operation::guard_zero;
     if (name == "guard_nonzero")
@@ -234,6 +248,8 @@ constexpr /* static */ std::size_t Word::getOperationArity(Operation op) {
     case Operation::le:
     case Operation::gt:
     case Operation::ge:
+    case Operation::land:
+    case Operation::lor:
         return 3;
     }
 

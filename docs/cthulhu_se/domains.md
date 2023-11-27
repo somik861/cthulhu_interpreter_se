@@ -199,3 +199,20 @@ guard guard_nonzero A
     if (X == Y)
         kill current thread
 ```
+
+### Logical domains
+Must be Equitable. We denot the domain as **logic**.
+Element is log.1 iff elem != elem_zero;
+The result log.0 == elem_zero; log.1 == elem const 1;
+
+```
+logic land A B -> C
+    pop A as X
+    pop B as Y
+    push X && Y to C
+
+logic lor A B -> C
+    pop A as X
+    pop B as Y
+    push X || Y to C
+```

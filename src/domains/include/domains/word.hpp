@@ -23,6 +23,8 @@ class Word : public IDomain {
         le,
         gt,
         ge,
+        land,
+        lor,
         guard_zero,
         guard_nonzero
     };
