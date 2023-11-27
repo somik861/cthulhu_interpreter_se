@@ -128,6 +128,7 @@ uint32_t Stck::compile(const std::string& operation, const std::vector<std::stri
         return Operation::pivot;
 
     details::throwers::invalidOperation(name, "Stck");
+    return Operation::pivot; // unreachable
 }
 /* static */ std::size_t Stck::getOperationArity(Operation op) {
     switch (op) {
@@ -144,5 +145,6 @@ uint32_t Stck::compile(const std::string& operation, const std::vector<std::stri
     }
 
     details::throwers::invalidOperationCode(op, "Stck");
+    return 0; // unreachable
 }
 } // namespace cthu::domains

@@ -24,6 +24,7 @@ constexpr interpreter::ThreadState execute(dict_t& state,
     }
 
     details::throwers::invalidOperationForArity(operation, 1);
+    return interpreter::ThreadState::Running; // unreachable
 }
 
 template <typename dict_t>
@@ -250,6 +251,7 @@ uint32_t Bv32::compile(const std::string& operation, const std::vector<std::stri
         return Operation::guard_nonzero;
 
     details::throwers::invalidOperation(name, "Bv32");
+    return Operation::lt; // unreachable;
 }
 /* static */ std::size_t Bv32::getOperationArity(Operation op) {
     switch (op) {
@@ -284,5 +286,6 @@ uint32_t Bv32::compile(const std::string& operation, const std::vector<std::stri
     }
 
     details::throwers::invalidOperationCode(op, "Bv32");
+    return 0; // unreachable
 }
 } // namespace cthu::domains::builtins

@@ -26,6 +26,7 @@ constexpr interpreter::ThreadState execute(dict_t& state,
     }
 
     details::throwers::invalidOperationForArity(operation, 1);
+    return interpreter::ThreadState::Running; // unreachable
 }
 
 template <typename dict_t>
@@ -224,6 +225,7 @@ uint32_t Word::compile(const std::string& operation, const std::vector<std::stri
         return Operation::guard_nonzero;
 
     details::throwers::invalidOperation(name, "Word");
+    return Operation::le; // unreachable
 }
 /* static */ std::size_t Word::getOperationArity(Operation op) {
     switch (op) {
@@ -254,6 +256,7 @@ uint32_t Word::compile(const std::string& operation, const std::vector<std::stri
     }
 
     details::throwers::invalidOperationCode(op, "Word");
+    return 0; // unreachable
 }
 
 } // namespace cthu::domains
