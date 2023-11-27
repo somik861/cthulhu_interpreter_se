@@ -79,7 +79,7 @@ template <std::size_t N>
 constexpr std::array<uint8_t, N> extractOperands(uint32_t value) noexcept {
     std::array<uint8_t, N> operands;
     for (std::size_t i = 0; i < N; ++i) {
-        operands[N - i] = value & 0b111;
+        operands[N - i - 1] = value & 0b111;
         value >>= 3;
     }
 
@@ -91,9 +91,44 @@ constexpr enum_t extractOperation(uint32_t value) noexcept {
     return static_cast<enum_t>(value >> 24);
 }
 
+namespace throwers {
+inline void invalidOperation(const std::string& name, const std::string& domain) {
+    throw std::invalid_argument(std::format("Operation {} is not supported in domain {}", name, domain));
+}
+
 template <typename enum_t>
-void throwInvalidOperation(enum_t op, std::size_t arity) {
+void invalidOperationCode(enum_t operation, const std::string& name) {
+    throw std::invalid_argument(
+        std::format("Invalid operation code: {} for domain {}", static_cast<uint32_t>(operation), name));
+}
+
+template <typename enum_t>
+void invalidOperationForArity(enum_t op, std::size_t arity) {
     throw std::invalid_argument(
         std::format("Invalid operation (code: {}) for arity {}", static_cast<uint32_t>(op), arity));
 }
+
+inline void unsupportedArity(std::size_t arity, const std::string& domain) {
+    throw std::invalid_argument(std::format("Unsupported arity {} for domain {}", arity, domain));
+}
+
+} // namespace throwers
+
+namespace ops_templ {
+template <typename val_t, typename dict_t, typename fun_t>
+constexpr void compute_unary(dict_t& state, std::array<uint8_t, 2> args, fun_t fun) {
+    auto arg = state.at(args[0])->pop<val_t>();
+
+    state.at(args[1])->push(fun(arg));
+}
+
+template <typename val_t, typename dict_t, typename fun_t>
+constexpr void compute_binary(dict_t& state, std::array<uint8_t, 3> args, fun_t fun) {
+    auto lhs = state.at(args[0])->pop<val_t>();
+    auto rhs = state.at(args[1])->pop<val_t>();
+
+    state.at(args[2])->push(fun(lhs, rhs));
+}
+} // namespace ops_templ
+
 } // namespace cthu::domains::details

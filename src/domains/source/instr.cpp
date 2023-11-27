@@ -5,6 +5,7 @@
 #include "program/instruction.hpp"
 #include "program/safe_dict.hpp"
 
+namespace cthu::domains {
 namespace {
 using Operation = cthu::domains::Instr::Operation;
 
@@ -12,10 +13,9 @@ template <typename dict_t>
 constexpr void execute(dict_t& state, Operation op) {
     switch (op) {
     case Operation::noop:
-        break;
-    default:
-        cthu::domains::details::throwInvalidOperation(op, 0);
+        return;
     }
+    details::throwers::invalidOperationForArity(op, 0);
 }
 template <typename dict_t>
 constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 1> args) {
@@ -25,16 +25,15 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 1> args)
     switch (op) {
     case Operation::drop:
         state.at(args[0])->pop<instruction_t>();
-        break;
+        return;
     case Operation::zero:
         if constexpr (std::is_same_v<instruction_t, cthu::program::Instruction>)
             state.at(args[0])->push(std::make_unique<instruction_t>("instr", "noop", std::vector<std::string>{}, 0));
         else
             state.at(args[0])->push(cthu::domains::Instr::noop_instruction);
-        break;
-    default:
-        cthu::domains::details::throwInvalidOperation(op, 1);
+        return;
     }
+    details::throwers::invalidOperationForArity(op, 1);
 }
 template <typename dict_t>
 constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 2> args) {
@@ -44,16 +43,16 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 2> args)
     switch (op) {
     case Operation::move:
         state.at(args[1])->push(state.at(args[0])->pop<instruction_t>());
+        return;
     case Operation::swap: {
         auto fst = state.at(args[0])->pop<instruction_t>();
         auto snd = state.at(args[1])->pop<instruction_t>();
         state.at(args[0])->push(std::move(snd));
         state.at(args[1])->push(std::move(fst));
-        break;
+        return;
     }
-    default:
-        cthu::domains::details::throwInvalidOperation(op, 2);
     }
+    details::throwers::invalidOperationForArity(op, 2);
 }
 template <typename dict_t>
 constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 3> args) {
@@ -65,48 +64,47 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 3> args)
         auto item = state.at(args[0])->pop<instruction_t>();
         if constexpr (std::is_same_v<instruction_t, cthu::program::Instruction>) {
             state.at(args[1])->push(std::unique_ptr<instruction_t>(new instruction_t(*item)));
-            state.at(args[2])->push(std::unique_ptr<instruction_t>(new instruction_t(*item)));
+            state.at(args[2])->push(std::move(item));
         } else {
             state.at(args[1])->push(item);
             state.at(args[2])->push(item);
         }
-        break;
+        return;
     }
-    default:
-        cthu::domains::details::throwInvalidOperation(op, 3);
     }
+    details::throwers::invalidOperationForArity(op, 3);
 }
 
 template <typename dict_t>
-constexpr cthu::interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode) {
-    Operation op = cthu::domains::details::extractOperation<Operation>(opcode);
-    std::size_t arity = cthu::domains::Instr::getOperationArity(op);
+constexpr interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode) {
+    Operation op = details::extractOperation<Operation>(opcode);
+    std::size_t arity = Instr::getOperationArity(op);
     switch (arity) {
     case 0:
         execute(state, op);
         break;
     case 1:
-        execute(state, op, cthu::domains::details::extractOperands<1>(opcode));
+        execute(state, op, details::extractOperands<1>(opcode));
+        break;
     case 2:
-        execute(state, op, cthu::domains::details::extractOperands<2>(opcode));
+        execute(state, op, details::extractOperands<2>(opcode));
         break;
     case 3:
-        execute(state, op, cthu::domains::details::extractOperands<3>(opcode));
+        execute(state, op, details::extractOperands<3>(opcode));
         break;
     default:
-        throw std::runtime_error(std::format("Unsupported arity {} for domain 'instr'", arity));
+        details::throwers::unsupportedArity(arity, "Instr");
     }
 
-    return cthu::interpreter::ThreadState::Running;
+    return interpreter::ThreadState::Running;
 }
 } // namespace
 
-namespace cthu::domains {
 constexpr interpreter::ThreadState Instr::call(const std::string& operation,
                                                const std::vector<std::string>& operands,
                                                program::SafeDict& state,
                                                std::vector<program::SafeDict>& new_threads) const /* override */ {
-    return callCommon(state, cthu::domains::Instr::compile(operation, operands));
+    return callCommon(state, Instr::compile(operation, operands));
 }
 
 constexpr interpreter::ThreadState Instr::call(uint32_t operation_code,
@@ -142,24 +140,23 @@ constexpr /* static */ Instr::Operation Instr::operationFromName(const std::stri
     if (name == "noop")
         return Operation::noop;
 
-    throw std::invalid_argument(std::format("Operation {} is not supported in domain Instr", name));
+    details::throwers::invalidOperation(name, "Instr");
 }
 
 constexpr /* static */ std::size_t Instr::getOperationArity(Operation op) {
     switch (op) {
-    case cthu::domains::Instr::Operation::dup:
+    case Operation::dup:
         return 3;
-    case cthu::domains::Instr::Operation::move:
-    case cthu::domains::Instr::Operation::swap:
+    case Operation::move:
+    case Operation::swap:
         return 2;
-    case cthu::domains::Instr::Operation::drop:
-    case cthu::domains::Instr::Operation::zero:
+    case Operation::drop:
+    case Operation::zero:
         return 1;
-    case cthu::domains::Instr::Operation::noop:
+    case Operation::noop:
         return 0;
-    default:
-        throw std::invalid_argument(std::format("Invalid operation code: {}", static_cast<uint32_t>(op)));
     }
+    details::throwers::invalidOperationCode(op, "Instr");
 }
 
 } // namespace cthu::domains

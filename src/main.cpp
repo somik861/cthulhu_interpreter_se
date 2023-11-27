@@ -1,10 +1,11 @@
+#include "domains/dict.hpp"
+#include "domains/instr.hpp"
 #include "interpreter/interpreter.hpp"
 #include "parser/parser.hpp"
 #include "program/dict.hpp"
 #include "program/safe_stack.hpp"
 #include "program/stack.hpp"
 #include "program/word.hpp"
-#include "domains/instr.hpp"
 
 #include <filesystem>
 #include <fstream>
