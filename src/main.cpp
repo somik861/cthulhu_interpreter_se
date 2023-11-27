@@ -1,5 +1,6 @@
 #include "domains/dict.hpp"
 #include "domains/instr.hpp"
+#include "domains/stck.hpp"
 #include "interpreter/interpreter.hpp"
 #include "parser/parser.hpp"
 #include "program/dict.hpp"
