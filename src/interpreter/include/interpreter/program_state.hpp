@@ -31,3 +31,9 @@ class ProgramState {
 };
 
 } // namespace cthu::interpreter
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& stream, const cthu::interpreter::ProgramState<T>& state) {
+    stream << state.toShortString();
+    return stream;
+}

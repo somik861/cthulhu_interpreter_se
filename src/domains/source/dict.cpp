@@ -135,6 +135,7 @@ uint32_t Dict::compile(const std::string& operation, const std::vector<std::stri
         return Operation::store;
 
     details::throwers::invalidOperation(name, "Dict");
+    return Operation::store; // unreachable
 }
 /* static */ std::size_t Dict::getOperationArity(Operation op) {
     switch (op) {
@@ -152,6 +153,7 @@ uint32_t Dict::compile(const std::string& operation, const std::vector<std::stri
     }
 
     details::throwers::invalidOperationCode(op, "Dict");
+    return 0; // unreachable
 }
 
 } // namespace cthu::domains

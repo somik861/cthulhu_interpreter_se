@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
         auto fin_states = i2.getFinishedStates();
         for (std::size_t i = 0; i < fin_states.size(); ++i) {
             std::cout << "--------- Fin state: " << i << ":\n";
-            std::cout << fin_states[i] << '\n';
+            std::cout << (*fin_states[i]) << '\n';
         }
     } catch (const std::exception& e) {
         std::cout << "An exception was thrown:\n" << e.what() << std::endl;

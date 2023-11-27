@@ -142,7 +142,7 @@ class Stack {
             misc::traits::type_of_tuple_t<misc::traits::idx_of_tuple_v<T, m_plain_types>, m_supported_types>;
 
         if constexpr (std::is_pointer_v<return_t> || std::is_same_v<return_t, FastInstruction>) {
-            uint64_t untagged = item & 0b000;
+            uint64_t untagged = (item >> 3) << 3; // remove low three bits
             return *reinterpret_cast<return_t*>(&untagged);
         } else {
             uint64_t shifted = item >> 3;

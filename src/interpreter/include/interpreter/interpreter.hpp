@@ -9,6 +9,7 @@
 #include "program/instruction.hpp"
 #include "program/safe_dict.hpp"
 
+#include <atomic>
 #include <cassert>
 #include <deque>
 #include <format>
@@ -16,7 +17,6 @@
 #include <memory>
 #include <set>
 #include <type_traits>
-#include <atomic>
 
 namespace cthu::interpreter {
 namespace details {
@@ -25,7 +25,7 @@ struct InterpreterData;
 
 template <>
 struct InterpreterData<Mode::Debug> {
-    std::size_t max_thread_id;
+    std::size_t max_thread_id = 0;
 };
 
 template <>
@@ -33,12 +33,12 @@ struct InterpreterData<Mode::Normal> : public InterpreterData<Mode::Debug> {};
 
 template <>
 struct InterpreterData<Mode::Fast> {
-    std::size_t max_thread_id;
+    std::size_t max_thread_id = 0;
 };
 
 template <>
 struct InterpreterData<Mode::Parallel> {
-    std::atomic_size_t max_thread_id;
+    std::atomic_size_t max_thread_id = 0;
 };
 
 inline std::size_t extractNextInstructionLine(const program::SafeDict& state) {
@@ -179,7 +179,7 @@ class Interpreter {
     std::vector<std::unique_ptr<program_state_t>> m_finished_states;
     std::deque<state_iterator_t> m_process_queue;
     program_state_t* m_stop_requester = nullptr;
-    details::InterpreterData<mode> m_data;
+    details::InterpreterData<mode> m_data{};
 };
 
 } // namespace cthu::interpreter
