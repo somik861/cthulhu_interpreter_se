@@ -52,8 +52,8 @@ class Dict {
         m_storage[key.value] = std::move(stack);
     }
 
-    std::string toShortString(bool is_on_top = true) const { return ""; };
-    std::string toJson(std::size_t indent = 0) const { return ""; }
+    std::string toShortString(bool is_on_top = true) const;
+    std::string toJson(std::size_t indent = 0) const;
 
   protected:
     std::vector<std::unique_ptr<Stack>> m_storage;
