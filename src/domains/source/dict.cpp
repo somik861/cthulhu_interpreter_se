@@ -54,7 +54,7 @@ constexpr void execute(dict_t& state, Dict::Operation operation, std::array<uint
         auto stack = state.pop(args[0]);
         auto dict = state.at(args[1])->template pop<program::Dict>();
         auto key = state.at(args[2])->template pop<program::Word>();
-        state.set(args[0], dict->template pop(key));
+        state.set(args[0], dict->pop(key));
         state.at(args[3])->push(std::move(dict));
         state.at(args[4])->push(std::move(stack));
         return;
@@ -97,20 +97,20 @@ constexpr interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode) {
 }
 } // namespace
 
-constexpr interpreter::ThreadState Dict::call(const std::string& operation,
-                                              const std::vector<std::string>& operands,
-                                              program::SafeDict& state,
-                                              std::vector<program::SafeDict>& new_threads) const /* override */ {
+interpreter::ThreadState Dict::call(const std::string& operation,
+                                    const std::vector<std::string>& operands,
+                                    program::SafeDict& state,
+                                    std::vector<program::SafeDict>& new_threads) const /* override */ {
     return callCommon(state, Dict::compile(operation, operands));
 }
 
-constexpr interpreter::ThreadState Dict::call(uint32_t operation_code,
-                                              program::Dict& state,
-                                              std::vector<program::Dict>& new_threads) const /* override */ {
+interpreter::ThreadState Dict::call(uint32_t operation_code,
+                                    program::Dict& state,
+                                    std::vector<program::Dict>& new_threads) const /* override */ {
     return callCommon(state, operation_code);
 }
 
-constexpr uint32_t Dict::compile(const std::string& operation, const std::vector<std::string>& operands) const
+uint32_t Dict::compile(const std::string& operation, const std::vector<std::string>& operands) const
 /* override */ {
     Operation op = operationFromName(operation);
     std::size_t arity = getOperationArity(op);
@@ -118,7 +118,7 @@ constexpr uint32_t Dict::compile(const std::string& operation, const std::vector
     return details::compress(op, operands);
 }
 
-constexpr /* static */ Dict::Operation Dict::operationFromName(const std::string& name) {
+/* static */ Dict::Operation Dict::operationFromName(const std::string& name) {
     if (name == "move")
         return Operation::move;
     if (name == "dup")
@@ -136,7 +136,7 @@ constexpr /* static */ Dict::Operation Dict::operationFromName(const std::string
 
     details::throwers::invalidOperation(name, "Dict");
 }
-constexpr /* static */ std::size_t Dict::getOperationArity(Operation op) {
+/* static */ std::size_t Dict::getOperationArity(Operation op) {
     switch (op) {
     case Operation::zero:
     case Operation::drop:

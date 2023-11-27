@@ -8,6 +8,7 @@
 namespace cthu::domains {
 namespace {
 using Operation = cthu::domains::Instr::Operation;
+program::FastInstruction noop_instruction{};
 
 template <typename dict_t>
 constexpr void execute(dict_t& state, Operation op) {
@@ -30,7 +31,7 @@ constexpr void execute(dict_t& state, Operation op, std::array<uint8_t, 1> args)
         if constexpr (std::is_same_v<instruction_t, cthu::program::Instruction>)
             state.at(args[0])->push(std::make_unique<instruction_t>("instr", "noop", std::vector<std::string>{}, 0));
         else
-            state.at(args[0])->push(cthu::domains::Instr::noop_instruction);
+            state.at(args[0])->push(noop_instruction);
         return;
     }
     details::throwers::invalidOperationForArity(op, 1);
@@ -100,25 +101,25 @@ constexpr interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode) {
 }
 } // namespace
 
-constexpr interpreter::ThreadState Instr::call(const std::string& operation,
-                                               const std::vector<std::string>& operands,
-                                               program::SafeDict& state,
-                                               std::vector<program::SafeDict>& new_threads) const /* override */ {
+interpreter::ThreadState Instr::call(const std::string& operation,
+                                     const std::vector<std::string>& operands,
+                                     program::SafeDict& state,
+                                     std::vector<program::SafeDict>& new_threads) const /* override */ {
     return callCommon(state, Instr::compile(operation, operands));
 }
 
-constexpr interpreter::ThreadState Instr::call(uint32_t operation_code,
-                                               program::Dict& state,
-                                               std::vector<program::Dict>& new_threads) const /* override */ {
+interpreter::ThreadState Instr::call(uint32_t operation_code,
+                                     program::Dict& state,
+                                     std::vector<program::Dict>& new_threads) const /* override */ {
     return callCommon(state, operation_code);
 }
 
-constexpr Instr::Instr(std::size_t domain_code) noexcept {
+Instr::Instr(std::size_t domain_code) noexcept {
     noop_instruction.domain_code = domain_code;
     noop_instruction.operation_code = details::compress(Operation::noop);
 }
 
-constexpr uint32_t Instr::compile(const std::string& operation, const std::vector<std::string>& operands) const
+uint32_t Instr::compile(const std::string& operation, const std::vector<std::string>& operands) const
 /* override */ {
     Operation op = operationFromName(operation);
     std::size_t arity = getOperationArity(op);
@@ -126,7 +127,7 @@ constexpr uint32_t Instr::compile(const std::string& operation, const std::vecto
     return details::compress(op, operands);
 }
 
-constexpr /* static */ Instr::Operation Instr::operationFromName(const std::string& name) {
+/* static */ Instr::Operation Instr::operationFromName(const std::string& name) {
     if (name == "move")
         return Operation::move;
     if (name == "dup")
@@ -141,9 +142,10 @@ constexpr /* static */ Instr::Operation Instr::operationFromName(const std::stri
         return Operation::noop;
 
     details::throwers::invalidOperation(name, "Instr");
+    return Operation::noop; // unreachable
 }
 
-constexpr /* static */ std::size_t Instr::getOperationArity(Operation op) {
+/* static */ std::size_t Instr::getOperationArity(Operation op) {
     switch (op) {
     case Operation::dup:
         return 3;
@@ -157,6 +159,7 @@ constexpr /* static */ std::size_t Instr::getOperationArity(Operation op) {
         return 0;
     }
     details::throwers::invalidOperationCode(op, "Instr");
+    return 0; // unreachable
 }
 
 } // namespace cthu::domains

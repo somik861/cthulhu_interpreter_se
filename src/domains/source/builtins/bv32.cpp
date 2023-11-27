@@ -17,10 +17,10 @@ constexpr interpreter::ThreadState execute(dict_t& state,
         return interpreter::ThreadState::Running;
     case Bv32::Operation::guard_zero:
         return (state.at(args[0])->template pop<program::Word>().value == 0) ? interpreter::ThreadState::Running
-                                                                    : interpreter::ThreadState::Killed;
+                                                                             : interpreter::ThreadState::Killed;
     case Bv32::Operation::guard_nonzero:
         return (state.at(args[0])->template pop<program::Word>().value != 0) ? interpreter::ThreadState::Running
-                                                                    : interpreter::ThreadState::Killed;
+                                                                             : interpreter::ThreadState::Killed;
     }
 
     details::throwers::invalidOperationForArity(operation, 1);
@@ -164,27 +164,27 @@ constexpr interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode, st
         execute(state, op, details::extractOperands<3>(opcode));
         break;
     default:
-        details::throwers::unsupportedArity(arity, "Word");
+        details::throwers::unsupportedArity(arity, "Bv32");
         break;
     }
     return interpreter::ThreadState::Running;
 }
 } // namespace
 
-constexpr interpreter::ThreadState Bv32::call(const std::string& operation,
-                                              const std::vector<std::string>& operands,
-                                              program::SafeDict& state,
-                                              std::vector<program::SafeDict>& new_threads) const /* override */ {
+interpreter::ThreadState Bv32::call(const std::string& operation,
+                                    const std::vector<std::string>& operands,
+                                    program::SafeDict& state,
+                                    std::vector<program::SafeDict>& new_threads) const /* override */ {
     return callCommon(state, Bv32::compile(operation, operands), new_threads);
 }
 
-constexpr interpreter::ThreadState Bv32::call(uint32_t operation_code,
-                                              program::Dict& state,
-                                              std::vector<program::Dict>& new_threads) const /* override */ {
+interpreter::ThreadState Bv32::call(uint32_t operation_code,
+                                    program::Dict& state,
+                                    std::vector<program::Dict>& new_threads) const /* override */ {
     return callCommon(state, operation_code, new_threads);
 }
 
-constexpr uint32_t Bv32::compile(const std::string& operation, const std::vector<std::string>& operands) const
+uint32_t Bv32::compile(const std::string& operation, const std::vector<std::string>& operands) const
 /* override */ {
     Operation op = operationFromName(operation);
     std::size_t arity = getOperationArity(op);
@@ -197,7 +197,7 @@ constexpr uint32_t Bv32::compile(const std::string& operation, const std::vector
     return details::compress(op, operands);
 }
 
-constexpr /* static */ Bv32::Operation Bv32::operationFromName(const std::string& name) {
+/* static */ Bv32::Operation Bv32::operationFromName(const std::string& name) {
     if (name == "move")
         return Operation::move;
     if (name == "dup")
@@ -249,9 +249,9 @@ constexpr /* static */ Bv32::Operation Bv32::operationFromName(const std::string
     if (name == "guard_nonzero")
         return Operation::guard_nonzero;
 
-    details::throwers::invalidOperation(name, "Word");
+    details::throwers::invalidOperation(name, "Bv32");
 }
-constexpr /* static */ std::size_t Bv32::getOperationArity(Operation op) {
+/* static */ std::size_t Bv32::getOperationArity(Operation op) {
     switch (op) {
     case Operation::zero:
     case Operation::drop:
@@ -283,6 +283,6 @@ constexpr /* static */ std::size_t Bv32::getOperationArity(Operation op) {
         return 3;
     }
 
-    details::throwers::invalidOperationCode(op, "Word");
+    details::throwers::invalidOperationCode(op, "Bv32");
 }
 } // namespace cthu::domains::builtins

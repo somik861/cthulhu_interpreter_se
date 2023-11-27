@@ -1,5 +1,6 @@
 #include "parser/parser.hpp"
 
+#include <stdexcept>
 #include <string_view>
 
 namespace {
@@ -63,6 +64,9 @@ std::pair<program::SafeDict, std::set<std::string>> Parser::parse(std::istream& 
 
         current_lines->emplace_back(line_number, std::string(view));
     }
+
+    if (!m_dict_lines.contains("init"))
+        throw std::runtime_error("Source code does not contain required dictionary: 'init'");
 
     return {*parseDict(m_dict_lines.at("init")), required_domains};
 }

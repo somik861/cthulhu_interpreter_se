@@ -90,20 +90,20 @@ constexpr interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode, st
 }
 } // namespace
 
-constexpr interpreter::ThreadState Stck::call(const std::string& operation,
-                                              const std::vector<std::string>& operands,
-                                              program::SafeDict& state,
-                                              std::vector<program::SafeDict>& new_threads) const /* override */ {
+interpreter::ThreadState Stck::call(const std::string& operation,
+                                    const std::vector<std::string>& operands,
+                                    program::SafeDict& state,
+                                    std::vector<program::SafeDict>& new_threads) const /* override */ {
     return callCommon(state, Stck::compile(operation, operands), new_threads);
 }
 
-constexpr interpreter::ThreadState Stck::call(uint32_t operation_code,
-                                              program::Dict& state,
-                                              std::vector<program::Dict>& new_threads) const /* override */ {
+interpreter::ThreadState Stck::call(uint32_t operation_code,
+                                    program::Dict& state,
+                                    std::vector<program::Dict>& new_threads) const /* override */ {
     return callCommon(state, operation_code, new_threads);
 }
 
-constexpr uint32_t Stck::compile(const std::string& operation, const std::vector<std::string>& operands) const
+uint32_t Stck::compile(const std::string& operation, const std::vector<std::string>& operands) const
 /* override */ {
     Operation op = operationFromName(operation);
     std::size_t arity = getOperationArity(op);
@@ -111,7 +111,7 @@ constexpr uint32_t Stck::compile(const std::string& operation, const std::vector
     return details::compress(op, operands);
 }
 
-constexpr /* static */ Stck::Operation Stck::operationFromName(const std::string& name) {
+/* static */ Stck::Operation Stck::operationFromName(const std::string& name) {
     if (name == "move")
         return Operation::move;
     if (name == "dup")
@@ -129,7 +129,7 @@ constexpr /* static */ Stck::Operation Stck::operationFromName(const std::string
 
     details::throwers::invalidOperation(name, "Stck");
 }
-constexpr /* static */ std::size_t Stck::getOperationArity(Operation op) {
+/* static */ std::size_t Stck::getOperationArity(Operation op) {
     switch (op) {
     case Operation::zero:
     case Operation::drop:

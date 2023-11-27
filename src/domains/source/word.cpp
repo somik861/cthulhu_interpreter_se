@@ -19,10 +19,10 @@ constexpr interpreter::ThreadState execute(dict_t& state,
         return interpreter::ThreadState::Running;
     case Word::Operation::guard_zero:
         return (state.at(args[0])->template pop<program::Word>().value == 0) ? interpreter::ThreadState::Running
-                                                                    : interpreter::ThreadState::Killed;
+                                                                             : interpreter::ThreadState::Killed;
     case Word::Operation::guard_nonzero:
         return (state.at(args[0])->template pop<program::Word>().value != 0) ? interpreter::ThreadState::Running
-                                                                    : interpreter::ThreadState::Killed;
+                                                                             : interpreter::ThreadState::Killed;
     }
 
     details::throwers::invalidOperationForArity(operation, 1);
@@ -153,20 +153,20 @@ constexpr interpreter::ThreadState callCommon(dict_t& state, uint32_t opcode, st
 }
 } // namespace
 
-constexpr interpreter::ThreadState Word::call(const std::string& operation,
-                                              const std::vector<std::string>& operands,
-                                              program::SafeDict& state,
-                                              std::vector<program::SafeDict>& new_threads) const /* override */ {
+interpreter::ThreadState Word::call(const std::string& operation,
+                                    const std::vector<std::string>& operands,
+                                    program::SafeDict& state,
+                                    std::vector<program::SafeDict>& new_threads) const /* override */ {
     return callCommon(state, Word::compile(operation, operands), new_threads);
 }
 
-constexpr interpreter::ThreadState Word::call(uint32_t operation_code,
-                                              program::Dict& state,
-                                              std::vector<program::Dict>& new_threads) const /* override */ {
+interpreter::ThreadState Word::call(uint32_t operation_code,
+                                    program::Dict& state,
+                                    std::vector<program::Dict>& new_threads) const /* override */ {
     return callCommon(state, operation_code, new_threads);
 }
 
-constexpr uint32_t Word::compile(const std::string& operation, const std::vector<std::string>& operands) const
+uint32_t Word::compile(const std::string& operation, const std::vector<std::string>& operands) const
 /* override */ {
     Operation op = operationFromName(operation);
     std::size_t arity = getOperationArity(op);
@@ -179,7 +179,7 @@ constexpr uint32_t Word::compile(const std::string& operation, const std::vector
     return details::compress(op, operands);
 }
 
-constexpr /* static */ Word::Operation Word::operationFromName(const std::string& name) {
+/* static */ Word::Operation Word::operationFromName(const std::string& name) {
     if (name == "move")
         return Operation::move;
     if (name == "dup")
@@ -225,7 +225,7 @@ constexpr /* static */ Word::Operation Word::operationFromName(const std::string
 
     details::throwers::invalidOperation(name, "Word");
 }
-constexpr /* static */ std::size_t Word::getOperationArity(Operation op) {
+/* static */ std::size_t Word::getOperationArity(Operation op) {
     switch (op) {
     case Operation::zero:
     case Operation::drop:

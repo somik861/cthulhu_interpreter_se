@@ -21,10 +21,10 @@ class IDomain {
      * @param[out] new_threads       new threads that should be created (vector will always be empty at call)
      * @return                       new thread state
      */
-    constexpr virtual interpreter::ThreadState call(const std::string& operation,
-                                                    const std::vector<std::string>& operands,
-                                                    program::SafeDict& state,
-                                                    std::vector<program::SafeDict>& new_threads) const = 0;
+    virtual interpreter::ThreadState call(const std::string& operation,
+                                          const std::vector<std::string>& operands,
+                                          program::SafeDict& state,
+                                          std::vector<program::SafeDict>& new_threads) const = 0;
 
     /**
      * @brief Call operation of given domain
@@ -34,9 +34,9 @@ class IDomain {
      * @param[out] new_threads       new threads that should be created (vector will always be empty at call)
      * @return                       new thread state
      */
-    constexpr virtual interpreter::ThreadState call(uint32_t operation_code,
-                                                    program::Dict& state,
-                                                    std::vector<program::Dict>& new_threads) const = 0;
+    virtual interpreter::ThreadState call(uint32_t operation_code,
+                                          program::Dict& state,
+                                          std::vector<program::Dict>& new_threads) const = 0;
 
     /**
      * @brief Compile operation with arguments to operation code
@@ -47,8 +47,7 @@ class IDomain {
      * @param[in] operands             operands
      * @return                         operation code
      */
-    constexpr virtual uint32_t compile(const std::string& operation,
-                                       const std::vector<std::string>& operands) const = 0;
+    virtual uint32_t compile(const std::string& operation, const std::vector<std::string>& operands) const = 0;
 
     constexpr virtual ~IDomain() noexcept = default;
 };

@@ -3,6 +3,7 @@
 #include "domains/instr.hpp"
 #include "domains/stck.hpp"
 #include "domains/word.hpp"
+
 #include "interpreter/interpreter.hpp"
 #include "parser/parser.hpp"
 #include "program/dict.hpp"
@@ -15,12 +16,29 @@
 #include <iostream>
 
 namespace fs = std::filesystem;
+namespace doms = cthu::domains;
 
 int main(int argc, char** argv) {
+    auto init_domains = [](auto& intr) {
+        // it is important to load Instruction first for all interpreters
+        intr.registerDomain("instr", std::make_unique<doms::Instr>(0));
+
+        // register other interpreter
+        intr.registerDomain("word", std::make_unique<doms::Word>());
+        intr.registerDomain("bv32", std::make_unique<doms::builtins::Bv32>());
+        intr.registerDomain("dict", std::make_unique<doms::Dict>());
+        intr.registerDomain("stck", std::make_unique<doms::Stck>());
+    };
+
     cthu::interpreter::Interpreter<cthu::interpreter::Mode::Debug> i1;
     cthu::interpreter::Interpreter<cthu::interpreter::Mode::Normal> i2;
     cthu::interpreter::Interpreter<cthu::interpreter::Mode::Fast> i3;
     cthu::interpreter::Interpreter<cthu::interpreter::Mode::Parallel> i4;
+
+    init_domains(i1);
+    init_domains(i2);
+    init_domains(i3);
+    init_domains(i4);
 
     cthu::parser::Parser parser;
 
