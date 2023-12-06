@@ -19,5 +19,5 @@ store A B C D -> E
     pop D as W
     put X to Y[Z]
     unpack W to [A]
-    push [Y] to E
+    push Y to E
 ```

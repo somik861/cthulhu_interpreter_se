@@ -1,0 +1,124 @@
+.struct bv32 builtin
+
+# set value n to compute the nth fib number
+arg_stack:
+   $30
+
+result:
+# its empty now, but the result will be here
+
+# CALL CONVETION:
+# every fib_* function needs to drop stck from stack 2 as a leftover of pilot
+# calling next function is done by: stck pivot 0 1 2
+
+# pops arg_stack and computs result for numbers <= 1, otherwise breaks
+fib_function_lt1_impl:
+	# delete leftover
+	stck drop 2
+
+	bv32 const 2 1
+	bv32 dup 4 4 1
+
+	bv32 lt 1 1 4
+	bv32 move 4 1
+
+	# breaks if not < 2
+	bv32 guard_nonzero 1
+
+	# compute 0 and 1
+	bv32 move 4 5
+
+	# call next
+	stck pivot 0 1 2
+
+
+fib_function_lt1:
+	@fib_function_lt1_impl
+
+# pops arg_stack and either computes the result, or puts back subresults and calls itself
+fib_function_gt1_impl:
+	# delete leftover
+	stck drop 2
+	bv32 const 2 1
+	bv32 dup 4 4 1
+	bv32 lt 1 1 4
+	bv32 move 4 1
+
+	# breaks if not < 2
+	bv32 guard_zero 1
+
+	bv32 dup 4 4 5
+	bv32 const 1 4
+	bv32 sub 5 4 5
+
+	bv32 swap 5 4
+	bv32 const 2 4
+	bv32 sub 5 4 4
+
+	# fib_sum_two_results
+	stck dup 6 6 1
+	# fib_compute
+	stck dup 7 7 1
+	# fib_compute
+	stck dup 7 7 1
+
+	# call next
+	stck pivot 0 1 2
+
+fib_function_gt1:
+	@fib_function_gt1_impl
+
+fib_sum_two_impl:
+	stck drop 2
+	bv32 add 5 5 4
+	bv32 move 4 5
+	# execute next function
+	stck pivot 0 1 2
+
+
+fib_sum_two_results:
+	@fib_sum_two_impl
+
+fib_end:
+	stck drop 2
+
+fib_compute_impl:
+	stck drop 2
+
+	stck dup 2 2 1
+	stck dup 3 3 1
+
+	# create leftover
+	stck dup 3 3 2
+
+	# execute both threads
+	stck split 1 1
+
+
+# computes fib(arg_stack) and puts it into (result)
+fib_compute:
+	@fib_compute_impl
+
+empty:
+
+main:
+	# execute fib computation
+	stck dup 7 7 1
+
+	stck pivot 0 1 2
+
+call_stack:
+	@fib_end
+
+%init:
+	0 => @main
+	1 => @call_stack
+	2 => @fib_function_lt1
+	3 => @fib_function_gt1
+	# the argument
+	4 => @arg_stack
+	# result
+	5 => @result
+	# these are non-standard keys
+	6 => @fib_sum_two_results
+	7 => @fib_compute

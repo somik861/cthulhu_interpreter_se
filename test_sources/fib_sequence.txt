@@ -4,22 +4,50 @@
 arg_stack:
    $30
 
-result:
-# its empty now, but the result will be here
+%init:
+	0 => @main
+	1 => @empty # call stack
+	2 => @empty # work stack
+	3 => @procedures # stack to save procedures definitions
+	4 => @arg_stack
+	5 => @empty # result will be put here
 
-# CALL CONVETION:
-# every fib_* function needs to drop stck from stack 2 as a leftover of pilot
-# calling next function is done by: stck pivot 0 1 2
 
-# pops arg_stack and computs result for numbers <= 1, otherwise breaks
-fib_function_lt1_impl:
-	# delete leftover
-	stck drop 2
+# Implementation defined stacks
+empty:
 
-	bv32 const 2 1
-	bv32 dup 4 4 1
+# all procedures has to start with prefix 'proc_'
+proc_fib:
+    # execute fib_big thread
+    stck move 3 2
+    stck move 3 2
+    stck move 3 2
+    stck dup 3 1 2
+    stck move 2 3
+    stck move 2 3
+    stck move 2 3
+    stck move 2 3
+    stck exec 1
 
-	bv32 lt 1 1 4
+    # execute fib_small thread
+    stck move 3 2
+    stck move 3 2
+    stck dup 3 1 2
+    stck move 2 3
+    stck move 2 3
+    stck move 2 3
+    stck exec 1
+
+    # kill current thread
+    bv32 zero 2
+    bv32 guard_nonzero 2
+
+proc_fib_small:
+    bv32 const 2 1
+	bv32 dup 4 2 3
+    bv32 move 3 4
+
+    bv32 lt 2 1 4
 	bv32 move 4 1
 
 	# breaks if not < 2
@@ -28,97 +56,48 @@ fib_function_lt1_impl:
 	# compute 0 and 1
 	bv32 move 4 5
 
-	# call next
-	stck pivot 0 1 2
+    # call next
+	stck exec 1
 
+    # kill current thread
+    bv32 zero 2
+    bv32 guard_nonzero 2
 
-fib_function_lt1:
-	@fib_function_lt1_impl
+proc_fib_big:
 
-# pops arg_stack and either computes the result, or puts back subresults and calls itself
-fib_function_gt1_impl:
-	# delete leftover
-	stck drop 2
-	bv32 const 2 1
-	bv32 dup 4 4 1
-	bv32 lt 1 1 4
-	bv32 move 4 1
+proc_sum_two_results:
 
-	# breaks if not < 2
-	bv32 guard_zero 1
-
-	bv32 dup 4 4 5
-	bv32 const 1 4
-	bv32 sub 5 4 5
-
-	bv32 swap 5 4
-	bv32 const 2 4
-	bv32 sub 5 4 4
-
-	# fib_sum_two_results
-	stck dup 6 6 1
-	# fib_compute
-	stck dup 7 7 1
-	# fib_compute
-	stck dup 7 7 1
-
-	# call next
-	stck pivot 0 1 2
-
-fib_function_gt1:
-	@fib_function_gt1_impl
-
-fib_sum_two_impl:
-	stck drop 2
-	bv32 add 5 5 4
-	bv32 move 4 5
-	# execute next function
-	stck pivot 0 1 2
-
-
-fib_sum_two_results:
-	@fib_sum_two_impl
-
-fib_end:
-	stck drop 2
-
-fib_compute_impl:
-	stck drop 2
-
-	stck dup 2 2 1
-	stck dup 3 3 1
-
-	# create leftover
-	stck dup 3 3 2
-
-	# execute both threads
-	stck split 1 1
-
-
-# computes fib(arg_stack) and puts it into (result)
-fib_compute:
-	@fib_compute_impl
-
-empty:
-
+procedures:
+    # main procedure for calculating fib
+    @proc_fib
+    # sums two numbers on top of the result stack
+    @proc_sum_two_results
+    # calculates fib <= 1, dies on bigger
+    @proc_fib_small
+    # calculates fib > 1, dies on smaller
+    @proc_fib_big
+    # empty stack just for convenience (and also as a final procedure)
+    @empty
+    
 main:
-	# execute fib computation
-	stck dup 7 7 1
+    # populate call stack
+    ## put empty stack at the bottom of the call stack
+    stck move 3 2
+    stck move 3 2
+    stck move 3 2
+    stck move 3 2
+    stck dup 3 1 2
+    stck move 2 3
+    stck move 2 3
+    stck move 2 3
+    stck move 2 3
 
-	stck pivot 0 1 2
+    # put proc_fib on top of the call stack
+    stck dup 2 3 1
 
-call_stack:
-	@fib_end
+    # execute thread with new stack
+    stck exec 1
 
-%init:
-	0 => @main
-	1 => @call_stack
-	2 => @fib_function_lt1
-	3 => @fib_function_gt1
-	# the argument
-	4 => @arg_stack
-	# result
-	5 => @result
-	# these are non-standard keys
-	6 => @fib_sum_two_results
-	7 => @fib_compute
+    # kill main thread
+    bv32 zero 2
+    bv32 guard_nonzero 2
