@@ -45,7 +45,7 @@ inline std::size_t extractNextInstructionLine(const program::SafeDict& state) {
     auto instruction_stack = state.at(0);
     if (instruction_stack->empty())
         return 0;
-    return instruction_stack->pop<program::Instruction>()->source_line;
+    return instruction_stack->peek<program::Instruction>()->source_line;
 }
 } // namespace details
 
@@ -78,6 +78,7 @@ class Interpreter {
         } else
             (*iterator)->state = compiler::to_fast_code(state, m_domain_map, m_domains);
 
+        m_stop_requester = iterator->get();
         m_process_queue.push_back(std::move(iterator));
     }
     constexpr bool canContinue() const noexcept { return !m_process_queue.empty(); }

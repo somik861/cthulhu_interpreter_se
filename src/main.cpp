@@ -59,7 +59,7 @@ std::optional<CmdLine> parse_cmdline(int argc, char** argv) {
     out.source_code = argv[1];
 
     auto parse_option = [&out](std::string_view sv) -> bool {
-        if (sv == "json") {
+        if (sv == "--json") {
             out.json = true;
             return true;
         }
@@ -71,7 +71,7 @@ std::optional<CmdLine> parse_cmdline(int argc, char** argv) {
         std::string_view option = sv.substr(0, idx);
         std::string_view value = sv.substr(idx + 1);
 
-        if (option == "mode") {
+        if (option == "--mode") {
             if (value == "debug")
                 out.mode = cthu::interpreter::Mode::Debug;
             else if (value == "normal")
@@ -87,7 +87,7 @@ std::optional<CmdLine> parse_cmdline(int argc, char** argv) {
             return true;
         }
 
-        if (option == "max_threads") {
+        if (option == "--max_threads") {
             std::size_t processed;
             out.max_threads = std::stoul(std::string(value), &processed);
             bool rv = processed == value.size();
@@ -96,7 +96,7 @@ std::optional<CmdLine> parse_cmdline(int argc, char** argv) {
             return rv;
         }
 
-        if (option == "read_result") {
+        if (option == "--read_result") {
             std::size_t processed;
             out.read_result = std::stoul(std::string(value), &processed);
             bool rv = processed == value.size() && out.read_result.value() < 6;
@@ -155,11 +155,7 @@ int main(int argc, char** argv) {
             auto [state, domains] = parser.parse(source_stream);
 
             interpreter.initExecution(state, domains);
-            do {
-                interpreter.continueExecution();
-                if (!interpreter.canContinue())
-                    break;
-                auto state = interpreter.getProgramState();
+            auto wait_pause = [&](auto state) {
                 std::cout << "State ID: " << state->thread_id << '\n';
                 if (args.json)
                     std::cout << state->toJson() << "\n\n";
@@ -168,6 +164,15 @@ int main(int argc, char** argv) {
                 std::cout << "Press enter to continue ... \n";
                 while (std::getchar() != '\n')
                     ;
+            };
+            if (args.mode == cthu::interpreter::Mode::Debug)
+                wait_pause(interpreter.getProgramState());
+            do {
+                interpreter.continueExecution();
+                if (!interpreter.canContinue())
+                    break;
+                wait_pause(interpreter.getProgramState());
+
             } while (true);
 
             std::cout << "===== program ended =====\n";
