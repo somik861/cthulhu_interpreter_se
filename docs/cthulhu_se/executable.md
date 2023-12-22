@@ -13,18 +13,18 @@ Pauses after each execution step and gives you information about the program sta
 Runs code and produces results. This mode tries to check restrictions provided in documentation and emits human-friendly error message when program does something forbidden.
 
 ## Fast
-This is (most of the time) significantly faster than *normal*. On the other, this mode does not check any restrictions. When you do something invalid, it may just work, or it may crash without anything helpfull to tell you. Try to run *normal* mode, if you encounter wierd behaviour using this mode to check errors in your code.
+This is (most of the time) significantly faster than *normal*. On the other hand, this mode does not check any restrictions. When you do something invalid, it may just work, or it may crash without anything helpfull to tell you. Try to run *normal* mode, if you encounter wierd behaviour using this mode to check errors in your code.
 
 ## Parallel
 Executetes cthulhu_se threads as a real threads. This may increase performance of some programs. Please note that executing real threads takes significantly more overhead than running everyhing in one thread, therefore, do not use this mode as *your default*. Similarly as *fast* mode, this mode does not check any restrictions and will crash horribly when given invalid instruction. You can se maximum number of threads using `--max_threads=N`.
 
 # Command line options
-`./cthulhu_se source_code`
+`./cthulhu_se source_code [ options ]`
 
-* `--imode=MODE` sets interpreter mode (default: normal)
+* `--mode=MODE` sets interpreter mode (default: normal)
 * `--max_threads=N` limits max number of threads in parallel mode (default: your CPU core count (including HT)).
 * `--read_result=N` instead of printing final state, read a number from stack **N** and print it as a result.
-* `--debug_json` print states in json-compatible format in debug mode.
+* `--json` print states in json-compatible format.
 
 # Text output
-If `--read_result` is not specified, the output is written in json-compatible format.
+If `--read_result` is not specified, the whole final states are writen to the output.
