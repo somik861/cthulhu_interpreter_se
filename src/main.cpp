@@ -161,7 +161,10 @@ int main(int argc, char** argv) {
                     break;
                 auto state = interpreter.getProgramState();
                 std::cout << "State ID: " << state->thread_id << '\n';
-                std::cout << *state << "\n\n";
+                if (args.json)
+                    std::cout << state->toJson() << "\n\n";
+                else
+                    std::cout << *state << "\n\n";
                 std::cout << "Press enter to continue ... \n";
                 while (std::getchar() != '\n')
                     ;
@@ -171,7 +174,10 @@ int main(int argc, char** argv) {
             auto fin_states = interpreter.getFinishedStates();
             for (std::size_t i = 0; i < fin_states.size(); ++i) {
                 std::cout << "--------- Fin state: " << i << ":\n";
-                std::cout << (*fin_states[i]) << '\n';
+                if (args.json)
+                    std::cout << fin_states[i]->toJson() << '\n';
+                else
+                    std::cout << (*fin_states[i]) << '\n';
             }
 
         } catch (const std::exception& e) {

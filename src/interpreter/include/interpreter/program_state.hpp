@@ -32,6 +32,11 @@ class ProgramState {
 
         return out;
     }
+
+    std::string toJson() const {
+        // TODO: json print
+        return "";
+    }
 };
 
 } // namespace cthu::interpreter
