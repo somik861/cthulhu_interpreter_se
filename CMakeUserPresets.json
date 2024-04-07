@@ -1,9 +1,0 @@
-{
-    "version": 4,
-    "vendor": {
-        "conan": {}
-    },
-    "include": [
-        "C:\\Users\\janju\\Workspace\\cthulhu_new\\build\\CMakePresets.json"
-    ]
-}
