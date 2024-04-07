@@ -1,13 +1,7 @@
-# IDEs
-.vscode
+# IDE data
 .vs
 
-# private folder
-/.private
-/private
-
-# build folders
-/build*
-/out
-
-/benchmark/bin
+# build artifacts
+.env
+build*
+out
