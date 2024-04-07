@@ -1,6 +1,7 @@
 #pragma once
 
 #include <domains/BitVector.hpp>
+#include <domains/Dictionary.hpp>
 #include <domains/DomainManager.hpp>
 #include <domains/IDomain.hpp>
 #include <domains/Sequence.hpp>
@@ -13,6 +14,7 @@ DomainManager::DomainManager() {
     m_domains[1] = std::make_unique<domains::BitVector16>();
     m_domains[2] = std::make_unique<domains::BitVector32>();
     m_domains[3] = std::make_unique<domains::Sequence>();
+    m_domains[3] = std::make_unique<domains::Dictionary>();
 }
 std::size_t DomainManager::getDomainID(std::string_view domain) const {
     for (std::size_t i = 0; i < m_domains.size(); ++i)
